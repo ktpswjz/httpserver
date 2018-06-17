@@ -7,6 +7,7 @@ import (
 )
 
 type Assistant interface {
+	Restart() error
 	GetBody(r *http.Request) ([]byte, error)
 	GetArgument(r *http.Request, v interface{}) error
 	Success(data interface{})

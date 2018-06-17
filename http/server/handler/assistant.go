@@ -19,6 +19,7 @@ type Assistant struct {
 	rip string
 	clientKey *rsakey.Public
 	randKey *rsakey.Private
+	restart func() error
 
 	record bool
 	input []byte
@@ -26,6 +27,14 @@ type Assistant struct {
 	enterTime time.Time
 	transferTime time.Time
 	leaveTime time.Time
+}
+
+func (s *Assistant) Restart() error {
+	if s.restart == nil {
+		return fmt.Errorf("restart not supported")
+	}
+
+	return s.restart()
 }
 
 func (s *Assistant) Success(data interface{}) {

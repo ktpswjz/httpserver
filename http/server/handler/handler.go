@@ -14,7 +14,7 @@ type Handler interface {
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
-func NewHandler(handle Handle, log types.Log) (Handler, error)  {
+func NewHandler(handle Handle, log types.Log, restart func() error) (Handler, error)  {
 	privateKey := &rsakey.Private{}
 	err := privateKey.Create(1024)
 	if err != nil {
@@ -26,7 +26,7 @@ func NewHandler(handle Handle, log types.Log) (Handler, error)  {
 	instance.requestId = id.NewTime()
 	instance.sqlEntityId = id.NewTime()
 	instance.randKey = privateKey
-
+	instance.restart = restart
 
 	if handle != nil {
 		handle.Map(instance.router)
@@ -42,6 +42,7 @@ type innerHandler struct {
 	requestId id.Generator
 	sqlEntityId id.Generator
 	randKey *rsakey.Private
+	restart func() error
 }
 
 func (s *innerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +95,7 @@ func (s *innerHandler) newAssistant(w http.ResponseWriter, r *http.Request) *Ass
 	instance.rid = s.requestId.New()
 	instance.rip, _, _ = net.SplitHostPort(r.RemoteAddr)
 	instance.randKey = s.randKey
-
+	instance.restart = s.restart
 
 	return instance
 }

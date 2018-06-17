@@ -13,11 +13,15 @@ import (
 
 type Host interface {
 	Run() error
+	Close() (err error)
 }
 
-func NewHost(config *configure.Server, handle handler.Handle, log types.Log) Host  {
+func NewHost(config *configure.Server, handle handler.Handle, log types.Log, restart func() error) Host  {
 	instance := &innerHost {config: config, handle: handle}
 	instance.SetLog(log)
+	instance.httpServer = nil
+	instance.httpsServer = nil
+	instance.restart = restart
 
 	return instance
 }
@@ -26,6 +30,9 @@ type innerHost struct {
 	types.Base
 	config *configure.Server
 	handle handler.Handle
+	httpServer *http.Server
+	httpsServer *http.Server
+	restart func() error
 }
 
 func (s *innerHost) Run() error  {
@@ -33,7 +40,7 @@ func (s *innerHost) Run() error  {
 		return errors.New(s.LogError("invalid configure"))
 	}
 
-	router, err := handler.NewHandler(s.handle, s.GetLog())
+	router, err := handler.NewHandler(s.handle, s.GetLog(), s.restart)
 	if err != nil {
 		return err
 	}
@@ -45,10 +52,16 @@ func (s *innerHost) Run() error  {
 		go func() {
 			addr := fmt.Sprintf(":%s", s.config.Http.Port)
 			s.LogInfo("http listening on \"", addr, "\"")
-			err := http.ListenAndServe(addr, router)
+			s.httpsServer = &http.Server{
+				Addr:    addr,
+				Handler: router,
+			}
+
+			err := s.httpsServer.ListenAndServe()
 			if err != nil {
 				s.LogError("http", err)
 			}
+			s.httpsServer = nil
 			ch <- "http stopped"
 		}()
 	}
@@ -64,7 +77,7 @@ func (s *innerHost) Run() error  {
 				addr := fmt.Sprintf(":%s", s.config.Https.Port)
 				s.LogInfo("https listening on \"", addr, "\"")
 
-				srv := &http.Server{
+				s.httpsServer = &http.Server{
 					Addr:    addr,
 					Handler: router,
 					TLSConfig: &tls.Config{
@@ -73,17 +86,17 @@ func (s *innerHost) Run() error  {
 					},
 				}
 
-				err = srv.ListenAndServeTLS("", "")
+				err = s.httpsServer.ListenAndServeTLS("", "")
 				if err != nil {
 					s.LogError("https", err)
 				}
+				s.httpsServer = nil
 			} else {
 				s.LogError("https cert invalid: ", err)
 			}
 
 			addr := fmt.Sprintf(":%s", s.config.Https.Port)
 			s.LogInfo("https listening on \"", addr, "\"")
-
 
 			ch <- "https stopped"
 		}()
@@ -96,4 +109,23 @@ func (s *innerHost) Run() error  {
 	s.LogInfo("exited", fmt.Sprintf("server count: %d", srvCount))
 
 	return nil
+}
+
+func (s *innerHost) Close() (err error)  {
+	err = nil
+	if s.httpServer != nil {
+		e := s.httpServer.Close()
+		if e != nil {
+			err = e
+		}
+	}
+
+	if s.httpsServer != nil {
+		e := s.httpsServer.Close()
+		if e != nil {
+			err = e
+		}
+	}
+
+	return
 }
