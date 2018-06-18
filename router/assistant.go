@@ -22,6 +22,7 @@ type Assistant interface {
 	Schema() string
 	RID() uint64
 	RIP() string
+	Token() string
 	ClientKey() *rsakey.Public
 	RandKey() *rsakey.Private
 	GenerateGuid() string

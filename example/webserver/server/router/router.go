@@ -6,6 +6,9 @@ import (
 	"github.com/ktpswjz/httpserver/router"
 	"net/http"
 	"strings"
+	"github.com/ktpswjz/httpserver/document"
+	"github.com/ktpswjz/httpserver/example/webserver/database/memory"
+	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
 )
 
 const (
@@ -27,6 +30,7 @@ type Router interface {
 func NewRouter(cfg *config.Config, log types.Log) Router  {
 	instance := &innerRouter {cfg: cfg}
 	instance.SetLog(log)
+	instance.dbToken, _ = memory.NewToken(cfg.Site.Admin.Api.Token.Expiration, log)
 
 	return instance
 }
@@ -34,6 +38,7 @@ func NewRouter(cfg *config.Config, log types.Log) Router  {
 type innerRouter struct {
 	types.Base
 	cfg *config.Config
+	dbToken memory.Token
 
 	// controllers
 	docController
@@ -42,6 +47,8 @@ type innerRouter struct {
 }
 
 func (s *innerRouter) Map(router *router.Router) {
+	router.Doc = document.NewDocument(s.cfg.Site.Doc.Enable, s.GetLog())
+
 	s.mapAuthApi(types.Path{Prefix:Auth}, router)
 	s.mapAppSite(types.Path{Prefix:App}, router, s.cfg.Site.App.Root)
 
@@ -55,6 +62,7 @@ func (s *innerRouter) Map(router *router.Router) {
 		s.mapDocApi(types.Path{Prefix:DocApi}, router)
 		s.mapDocSite(types.Path{Prefix:Doc}, router, s.cfg.Site.Doc.Root)
 		s.LogInfo("doc is enabled")
+		router.Doc.GenerateCatalogTree()
 	}
 }
 
@@ -70,7 +78,20 @@ func (s *innerRouter) PreRouting(w http.ResponseWriter, r *http.Request, a route
 	}
 
 	if isAdminApi(path) {
-
+		token := a.Token()
+		if token == "" {
+			a.Error(errors.AuthNoToken)
+			return true
+		}
+		tokenEntity, err := s.dbToken.Get(token)
+		if err != nil || tokenEntity == nil {
+			a.Error(errors.AuthTokenInvalid, err)
+			return true
+		}
+		if a.RIP() != tokenEntity.LoginIP {
+			a.Error(errors.AuthTokenIllegal)
+			return true
+		}
 	}
 
 	// default to admin site

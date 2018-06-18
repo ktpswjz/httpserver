@@ -17,6 +17,7 @@ type Assistant struct {
 	path string
 	rid uint64
 	rip string
+	token string
 	clientKey *rsakey.Public
 	randKey *rsakey.Private
 	restart func() error
@@ -110,6 +111,10 @@ func (s *Assistant) RID() uint64  {
 
 func (s *Assistant) RIP() string  {
 	return s.rip
+}
+
+func (s *Assistant) Token() string  {
+	return s.token
 }
 
 func (s *Assistant) ClientKey() *rsakey.Public  {

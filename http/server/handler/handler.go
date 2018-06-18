@@ -96,6 +96,12 @@ func (s *innerHandler) newAssistant(w http.ResponseWriter, r *http.Request) *Ass
 	instance.rip, _, _ = net.SplitHostPort(r.RemoteAddr)
 	instance.randKey = s.randKey
 	instance.restart = s.restart
+	instance.token = r.Header.Get("token")
+	if instance.token == "" {
+		if r.Method == "GET" {
+			instance.token = r.FormValue("token")
+		}
+	}
 
 	return instance
 }
