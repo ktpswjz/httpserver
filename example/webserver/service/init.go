@@ -5,9 +5,9 @@ import (
 	"github.com/ktpswjz/httpserver/logger"
 	"github.com/ktpswjz/httpserver/types"
 	"os"
-	"path/filepath"
 	"fmt"
 	"github.com/kardianos/service"
+	"path/filepath"
 )
 
 const (
@@ -28,31 +28,17 @@ func init() {
 	moduleArgs := &types.Args{}
 	serverArgs := &Args{}
 	moduleArgs.Parse(os.Args, moduleType, moduleName, moduleVersion, moduleRemark, serverArgs)
-	configPath := serverArgs.config
-	if configPath == "" {
-		configPath = filepath.Join(moduleArgs.ModuleFolder(), "config.json")
-	}
-	cfg.LoadFromFile(configPath)
-	if serverArgs.showConfig {
-		fmt.Println(cfg.FormatString())
-		os.Exit(0)
-	}
-	cfg.SetVersion(moduleArgs.ModuleVersion())
 
-	if cfg.Server.Https.Enabled {
-		certFilePath := cfg.Server.Https.Cert.File
-		if certFilePath == "" {
-			certFilePath = filepath.Join(moduleArgs.ModuleFolder(), "server.pfx")
-			cfg.Server.Https.Cert.File = certFilePath
-		}
-	}
-
+	// service
 	svcCfg := &service.Config{
 		Name: moduleName,
 		DisplayName: moduleName,
 		Description: moduleRemark,
 	}
-
+	configPath := serverArgs.config
+	if configPath != "" {
+		svcCfg.Arguments = []string{fmt.Sprintf("-config=%s", configPath)}
+	}
 	svcVal, err := service.New(pro, svcCfg)
 	if err != nil {
 		fmt.Print("init service fail: ", err)
@@ -61,9 +47,6 @@ func init() {
 	svc = svcVal
 	if serverArgs.help {
 		serverArgs.ShowHelp()
-		os.Exit(0)
-	} else if serverArgs.showConfig {
-		fmt.Println(cfg.String())
 		os.Exit(0)
 	} else if serverArgs.isInstall {
 		err = svc.Install()
@@ -104,6 +87,40 @@ func init() {
 		} else {
 			fmt.Println("restart service ", svc.String(), " success")
 		}
+		os.Exit(0)
+	}
+
+	// config
+	if configPath == "" {
+		configPath = filepath.Join(moduleArgs.ModuleFolder(), "config.json")
+	}
+	_, err = os.Stat(configPath)
+	if os.IsNotExist(err) {
+		err = cfg.SaveToFile(configPath)
+		if err != nil {
+			fmt.Println("generate configure file fail: ", err)
+		}
+	} else {
+		err = cfg.LoadFromFile(configPath)
+		if err != nil {
+			fmt.Println("load configure file fail: ", err)
+		}
+	}
+	if serverArgs.showConfig {
+		fmt.Println(cfg.FormatString())
+		os.Exit(0)
+	}
+	cfg.SetVersion(moduleArgs.ModuleVersion())
+
+	if cfg.Server.Https.Enabled {
+		certFilePath := cfg.Server.Https.Cert.File
+		if certFilePath == "" {
+			certFilePath = filepath.Join(moduleArgs.ModuleFolder(), "server.pfx")
+			cfg.Server.Https.Cert.File = certFilePath
+		}
+	}
+	if serverArgs.showConfig {
+		fmt.Println(cfg.String())
 		os.Exit(0)
 	}
 

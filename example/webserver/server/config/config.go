@@ -5,9 +5,13 @@ import (
 	"github.com/ktpswjz/httpserver/http/server/configure"
 	"io/ioutil"
 	"encoding/json"
+	"sync"
+	"os"
+	"fmt"
 )
 
 type Config struct {
+	mutex 	sync.RWMutex
 	version *types.Version
 
 	Name 	string 					`json:"name"`
@@ -87,6 +91,9 @@ func (s *Config) GetServer() *configure.Server  {
 }
 
 func (s *Config) LoadFromFile(filePath string) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
 	bytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return err
@@ -96,7 +103,23 @@ func (s *Config) LoadFromFile(filePath string) error {
 }
 
 func (s *Config) SaveToFile(filePath string) error {
-	return nil
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	bytes, err := json.MarshalIndent(s, "", "    ")
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = fmt.Fprint(file, string(bytes[:]))
+
+	return err
 }
 
 func (s *Config) String() string {
