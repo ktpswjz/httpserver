@@ -41,12 +41,14 @@ func (s *Args) Parse(key, value string)  {
 }
 
 func (s *Args) ShowHelp()  {
-	fmt.Println(" -help:			", "show the usage")
-	fmt.Println(" -config:		", "set the config file path, default is 'config.json'")
+	fmt.Println(" -help:		", "show the usage")
+	fmt.Println(" -config:	", "set the config file path, default is 'config.json'")
 	fmt.Println(" -showConfig:	", "show current configure")
-	fmt.Println(" -install:		", "install as system service")
+	fmt.Println(" -install:	", "install as system service")
 	fmt.Println(" -uninstall:	", "uninstall from system service")
-	fmt.Println(" -start:		", "start the system service")
-	fmt.Println(" -stop:			", "stop the system service")
-	fmt.Println(" -restart:		", "restart the system service")
+	fmt.Println(" -start:	", "start the system service")
+	fmt.Println(" -stop:		", "stop the system service")
+	fmt.Println(" -restart:	", "restart the system service")
+	fmt.Println(" example for install as service with specified configure file:")
+	fmt.Println("   -install -config=/etc/web.server/config.json")
 }

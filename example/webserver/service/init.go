@@ -50,7 +50,7 @@ func init() {
 		os.Exit(0)
 	} else if serverArgs.isInstall {
 		err = svc.Install()
-		if err != err {
+		if err != nil {
 			fmt.Println("install service ", svc.String(), " fail: ", err)
 		} else {
 			fmt.Println("install service ", svc.String(), " success")
@@ -58,7 +58,7 @@ func init() {
 		os.Exit(0)
 	} else if serverArgs.isUninstall {
 		err = svc.Uninstall()
-		if err != err {
+		if err != nil {
 			fmt.Println("uninstall service ", svc.String(), " fail: ", err)
 		} else {
 			fmt.Println("uninstall service ", svc.String(), " success")
@@ -66,7 +66,7 @@ func init() {
 		os.Exit(0)
 	} else if serverArgs.isStart {
 		err = svc.Start()
-		if err != err {
+		if err != nil {
 			fmt.Println("start service ", svc.String(), " fail: ", err)
 		} else {
 			fmt.Println("start service ", svc.String(), " success")
@@ -74,7 +74,7 @@ func init() {
 		os.Exit(0)
 	} else if serverArgs.isStop {
 		err = svc.Stop()
-		if err != err {
+		if err != nil {
 			fmt.Println("stop service ", svc.String(), " fail: ", err)
 		} else {
 			fmt.Println("stop service ", svc.String(), " success")
@@ -82,7 +82,7 @@ func init() {
 		os.Exit(0)
 	} else if serverArgs.isRestart {
 		err = svc.Restart()
-		if err != err {
+		if err != nil {
 			fmt.Println("restart service ", svc.String(), " fail: ", err)
 		} else {
 			fmt.Println("restart service ", svc.String(), " success")
