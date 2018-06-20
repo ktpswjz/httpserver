@@ -14,6 +14,7 @@ var (
 	LoginCaptchaInvalid = types.NewError(10001, "验证码无效")
 	LoginAccountNotExit = types.NewError(10002, "账号不存在")
 	LoginPasswordInvalid = types.NewError(10003, "密码不正确")
+	LoginAccountOrPasswordInvalid = types.NewError(10004, "账号或密码不正确")
 
 	AuthNoToken = types.NewError(20001, "缺少凭证")
 	AuthTokenInvalid = types.NewError(20001, "凭证无效")

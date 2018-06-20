@@ -71,6 +71,7 @@ func (s *Doc) CreateToken(w http.ResponseWriter, r *http.Request, p router.Param
 	now := time.Now()
 	token := &model.Token{
 		ID: a.GenerateGuid(),
+		UserAccount: user.Account,
 		LoginIP: a.RIP(),
 		LoginTime: now,
 		ActiveTime: now,

@@ -63,6 +63,12 @@ func NewConfig() *Config  {
 						Password: "1",
 					},
 				},
+				Ldap: SiteAdminLdap {
+					Enable: true,
+					Host: "192.168.123.1",
+					Port: 389,
+					Base: "dc=csby,dc=studio",
+				},
 			},
 		},
 	}

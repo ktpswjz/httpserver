@@ -9,13 +9,23 @@ import (
 type adminController struct {
 	adminConfig *admin.Config
 	adminSys *admin.Sys
+	adminLogout *admin.Logout
 }
 
 func (s *innerRouter) mapAdminApi(path types.Path, router *router.Router) {
 	s.adminConfig = &admin.Config{}
 	s.adminConfig.Config = s.cfg
 	s.adminConfig.SetLog(s.GetLog())
+
 	s.adminSys = &admin.Sys{}
+
+	s.adminLogout = &admin.Logout{}
+	s.adminLogout.Config = s.cfg
+	s.adminLogout.DbToken = s.dbToken
+	s.adminLogout.SetLog(s.GetLog())
+
+	// 退出登陆
+	router.POST(path.Path("/logout"), s.adminLogout.Logout, s.adminLogout.LogoutDoc)
 
 	// 获取配置信息
 	router.POST(path.Path("/config"), s.adminConfig.GetInfo, nil)

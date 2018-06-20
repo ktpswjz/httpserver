@@ -55,6 +55,7 @@ func (s *Assistant) OutputJson(code int, data interface{}, errSummary string, er
 		Code: code,
 		Data: data,
 		Elapse: time.Now().Sub(s.enterTime).String(),
+		Serial: s.rid,
 		Error: types.ResultError {
 			Summary: errSummary,
 			Detail: fmt.Sprint(errDetails...),
