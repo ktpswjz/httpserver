@@ -10,6 +10,7 @@ type adminController struct {
 	adminConfig *admin.Config
 	adminSys *admin.Sys
 	adminLogout *admin.Logout
+	adminApp *admin.App
 }
 
 func (s *innerRouter) mapAdminApi(path types.Path, router *router.Router) {
@@ -24,6 +25,11 @@ func (s *innerRouter) mapAdminApi(path types.Path, router *router.Router) {
 	s.adminLogout.DbToken = s.dbToken
 	s.adminLogout.SetLog(s.GetLog())
 
+	s.adminApp = &admin.App{}
+	s.adminApp.Config = s.cfg
+	s.adminApp.DbToken = s.dbToken
+	s.adminApp.SetLog(s.GetLog())
+
 	// 退出登陆
 	router.POST(path.Path("/logout"), s.adminLogout.Logout, s.adminLogout.LogoutDoc)
 
@@ -34,4 +40,9 @@ func (s *innerRouter) mapAdminApi(path types.Path, router *router.Router) {
 	router.POST(path.Path("/sys/host"), s.adminSys.GetHost, s.adminSys.GetHostDoc)
 	router.POST(path.Path("/sys/network/interfaces"), s.adminSys.GetNetworkInterfaces, s.adminSys.GetNetworkInterfacesDoc)
 	router.POST(path.Path("/sys/disk/partitions"), s.adminSys.GetDiskPartitions, s.adminSys.GetDiskPartitionsDoc)
+
+	// APP
+	router.POST(path.Path("/app/upload"), s.adminApp.Upload, nil)
+	router.POST(path.Path("/app/tree"), s.adminApp.Tree, s.adminApp.TreeDoc)
+	router.POST(path.Path("/app/delete"), s.adminApp.Delete, s.adminApp.DeleteDoc)
 }

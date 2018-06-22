@@ -95,6 +95,7 @@ func (s *Example) parseModel(v reflect.Value, argument *ModelArgument)  {
 					child.Required = true
 				}
 				child.Note = typeField.Tag.Get("note")
+				child.parent = argument
 				argument.Childs = append(argument.Childs, child)
 
 				value := reflect.ValueOf(valueField.Interface())
@@ -122,7 +123,7 @@ func (s *Example) parseModel(v reflect.Value, argument *ModelArgument)  {
 		if ste != nil {
 			argument.Type =  fmt.Sprintf("%s[]", ste.Name())
 
-			if ste.Kind() == reflect.Struct {
+			if ste.Kind() == reflect.Struct && argument.ParentType() != ste.Name() {
 				stet := reflect.New(ste)
 				child := &ModelArgument{Childs: make([]*ModelArgument, 0)}
 				child.Type = ste.Name()

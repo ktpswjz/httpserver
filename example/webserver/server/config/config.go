@@ -47,7 +47,7 @@ func NewConfig() *Config  {
 		},
 		Site: Site{
 			App: SiteApp{
-				Root: "",
+				Root: "/home/dev/project/apps",
 			},
 			Doc: SiteDoc{
 				Enable: true,
