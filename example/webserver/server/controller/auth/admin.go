@@ -15,7 +15,8 @@ import (
 type Admin struct {
 	controller.Base
 
-	Authenticate func(account, password string) error
+	Authenticate 	func(account, password string) error
+	ErrorCount		map[string]int
 }
 
 func (s *Admin) GetInfo(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant)  {
@@ -74,6 +75,7 @@ func (s *Admin) GetCaptcha(w http.ResponseWriter, r *http.Request, p router.Para
 	data := &model.Captcha{
 		ID: captchaId,
 		Value: base64Captcha.CaptchaWriteToBase64Encoding(captchaValue),
+		Required: s.captchaRequired(a.RIP()),
 	}
 	randKey := a.RandKey()
 	if randKey != nil {
@@ -118,17 +120,20 @@ func (s *Admin) Login(w http.ResponseWriter, r *http.Request, p router.Params, a
 		a.Error(errors.InputError,  err)
 		return
 	}
-	err = filter.Check()
+
+	requireCaptcha := s.captchaRequired(a.RIP())
+	err = filter.Check(requireCaptcha)
 	if err != nil {
 		a.Error(errors.InputInvalid,  err)
 		return
 	}
 
-	if !base64Captcha.VerifyCaptcha(filter.CaptchaId, filter.CaptchaValue) {
-		a.Error(errors.LoginCaptchaInvalid)
-		return
+	if requireCaptcha {
+		if !base64Captcha.VerifyCaptcha(filter.CaptchaId, filter.CaptchaValue) {
+			a.Error(errors.LoginCaptchaInvalid)
+			return
+		}
 	}
-
 
 	if s.Authenticate == nil {
 		a.Error(errors.Exception, "not auth provider")
@@ -140,6 +145,7 @@ func (s *Admin) Login(w http.ResponseWriter, r *http.Request, p router.Params, a
 		decryptedPwd, err := a.RandKey().DecryptData(filter.Password)
 		if err != nil {
 			a.Error(errors.LoginPasswordInvalid, err)
+			s.increaseErrorCount(a.RIP())
 			return
 		}
 		pwd = string(decryptedPwd)
@@ -148,6 +154,7 @@ func (s *Admin) Login(w http.ResponseWriter, r *http.Request, p router.Params, a
 	err = s.Authenticate(filter.Account, pwd)
 	if err != nil {
 		a.Error(errors.LoginAccountOrPasswordInvalid, err)
+		s.increaseErrorCount(a.RIP())
 		return
 	}
 
@@ -167,9 +174,11 @@ func (s *Admin) Login(w http.ResponseWriter, r *http.Request, p router.Params, a
 
 	login := &model.Login {
 		Token: token.ID,
+		Account: token.UserAccount,
 	}
 
 	a.Success(login)
+	s.clearErrorCount(a.RIP())
 }
 
 func (s *Admin) LoginDoc(a document.Assistant) document.Function  {
@@ -191,4 +200,46 @@ func (s *Admin) LoginDoc(a document.Assistant) document.Function  {
 	catalog.CreateChild("权限管理", "系统授权相关接口").SetFunction(function)
 
 	return function
+}
+
+func (s *Admin) captchaRequired(ip string) bool {
+	if s.ErrorCount == nil {
+		return false
+	}
+
+	count, ok := s.ErrorCount[ip]
+	if ok {
+		if count < 3 {
+			return false
+		} else {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (s *Admin) increaseErrorCount(ip string) {
+	if s.ErrorCount == nil {
+		return
+	}
+
+	count := 1
+	v, ok := s.ErrorCount[ip]
+	if ok {
+		count += v
+	}
+
+	s.ErrorCount[ip] = count
+}
+
+func (s *Admin) clearErrorCount(ip string) {
+	if s.ErrorCount == nil {
+		return
+	}
+
+	_, ok := s.ErrorCount[ip]
+	if ok {
+		delete(s.ErrorCount, ip)
+	}
 }

@@ -19,6 +19,7 @@ func (s *innerRouter) mapAuthApi(path types.Path, router *router.Router) {
 	s.authAdmin.Config = s.cfg
 	s.authAdmin.DbToken = s.dbToken
 	s.authAdmin.Authenticate = s.adminAuthentication.Authenticate
+	s.authAdmin.ErrorCount = make(map[string]int, 0)
 
 	// 获取平台信息
 	router.POST(path.Path("/sys/info"), s.authAdmin.GetInfo, s.authAdmin.GetInfoDoc)

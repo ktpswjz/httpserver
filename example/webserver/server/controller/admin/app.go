@@ -125,19 +125,19 @@ func (s *App) Delete(w http.ResponseWriter, r *http.Request, p router.Params, a 
 		a.Error(errors.InputError,  err)
 		return
 	}
-	if filter.Name == "" {
-		a.Error(errors.InputError,  "应用程序名称为空")
+	if filter.Path == "" {
+		a.Error(errors.InputError,  "应用程序路径为空")
 		return
 	}
 
-	appPath := filepath.Join(s.Config.Site.App.Root, filter.Name)
+	appPath := filepath.Join(s.Config.Site.App.Root, filter.Path)
 	info, err := os.Stat(appPath)
 	if os.IsNotExist(err) {
-		a.Error(errors.InputError,  fmt.Sprintf("应用程序'%s'不存在", filter.Name))
+		a.Error(errors.InputError,  fmt.Sprintf("应用程序'%s'不存在", filter.Path))
 		return
 	}
 	if !info.IsDir() {
-		a.Error(errors.InputError,  fmt.Sprintf("应用程序'%s'无效", filter.Name))
+		a.Error(errors.InputError,  fmt.Sprintf("应用程序'%s'无效", filter.Path))
 		return
 	}
 	err = os.RemoveAll(appPath)
@@ -146,14 +146,14 @@ func (s *App) Delete(w http.ResponseWriter, r *http.Request, p router.Params, a 
 		return
 	}
 
-	a.Success(filter.Name)
+	a.Success(filter.Path)
 }
 
 func (s *App) DeleteDoc(a document.Assistant) document.Function  {
 	function := a.CreateFunction("删除应用程序")
 	function.SetNote("删除存在的应用程序")
 	function.SetInputExample(&model.AppFilter{
-		Name: "test",
+		Path: "test",
 	})
 	function.SetOutputExample("test")
 

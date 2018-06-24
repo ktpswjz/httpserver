@@ -52,7 +52,7 @@ func (s *App) SaveToFile(filePath string) error {
 }
 
 type AppFilter struct {
-	Name		string		`json:"name" note:"应用程序名称"`
+	Path		string		`json:"path" note:"应用程序路径"`
 }
 
 type AppTree struct {
