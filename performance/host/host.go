@@ -58,7 +58,7 @@ func memoryToText(v float64) string  {
 
 	if v >= gb {
 		return fmt.Sprintf("%.1fGB", v / gb)
-	} else if v >= gb {
+	} else if v >= mb {
 		return fmt.Sprintf("%.1fMB", v / mb)
 	} else if v >= kb {
 		return fmt.Sprintf("%.1fKB", v / kb)

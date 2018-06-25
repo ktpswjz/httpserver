@@ -14,10 +14,21 @@ import (
 	"github.com/ktpswjz/httpserver/types"
 	"time"
 	"github.com/ktpswjz/httpserver/document"
+	"github.com/ktpswjz/httpserver/example/webserver/server/config"
+	"github.com/ktpswjz/httpserver/example/webserver/database/memory"
 )
 
 type App struct {
 	controller.Base
+}
+
+func NewApp(cfg *config.Config, log types.Log, dbToken memory.Token) *App  {
+	instance := &App{}
+	instance.Config = cfg
+	instance.SetLog(log)
+	instance.DbToken = dbToken
+
+	return instance
 }
 
 func (s *App) Upload(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant) {

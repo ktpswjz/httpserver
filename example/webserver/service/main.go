@@ -11,6 +11,11 @@ func main() {
 	log.Std = false
 	defer log.Close()
 
+	LogInfo("start at: ", cfg.GetArgs().ModulePath())
+	LogInfo("version: ", moduleVersion)
+	LogInfo("log path: ", cfg.Log.Folder)
+	LogInfo("configure info: ", cfg)
+
 	router := router.NewRouter(cfg, log)
 	if service.Interactive() {
 		host := host.NewHost(cfg.GetServer(), router, log, nil)

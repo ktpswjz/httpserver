@@ -54,7 +54,7 @@ func (s *innerRouter) Map(router *router.Router) {
 
 	if s.cfg.Site.Admin.Enable {
 		s.mapAdminApi(types.Path{Prefix:AdminApi}, router)
-		s.mapAdminSite(types.Path{Prefix:AdminApi}, router, s.cfg.Site.Admin.Root)
+		s.mapAdminSite(types.Path{Prefix:Admin}, router, s.cfg.Site.Admin.Root)
 		s.LogInfo("admin is enabled")
 	}
 

@@ -12,7 +12,7 @@ import (
 
 type Config struct {
 	mutex 	sync.RWMutex
-	version *types.Version
+	args 	*types.Args
 
 	Name 	string 					`json:"name"`
 	Log 	Log 					`json:"log"`
@@ -78,12 +78,12 @@ func NewConfig() *Config  {
 	}
 }
 
-func (s *Config) SetVersion(version *types.Version)  {
-	s.version = version
+func (s *Config) SetArgs(args *types.Args)  {
+	s.args = args
 }
 
-func (s *Config) GetVersion() *types.Version  {
-	return s.version
+func (s *Config) GetArgs() *types.Args  {
+	return s.args
 }
 
 func (s *Config) GetServer() *configure.Server  {

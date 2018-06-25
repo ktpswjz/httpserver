@@ -11,24 +11,15 @@ type adminController struct {
 	adminSys *admin.Sys
 	adminLogout *admin.Logout
 	adminApp *admin.App
+	adminService *admin.Service
 }
 
 func (s *innerRouter) mapAdminApi(path types.Path, router *router.Router) {
-	s.adminConfig = &admin.Config{}
-	s.adminConfig.Config = s.cfg
-	s.adminConfig.SetLog(s.GetLog())
-
 	s.adminSys = &admin.Sys{}
-
-	s.adminLogout = &admin.Logout{}
-	s.adminLogout.Config = s.cfg
-	s.adminLogout.DbToken = s.dbToken
-	s.adminLogout.SetLog(s.GetLog())
-
-	s.adminApp = &admin.App{}
-	s.adminApp.Config = s.cfg
-	s.adminApp.DbToken = s.dbToken
-	s.adminApp.SetLog(s.GetLog())
+	s.adminConfig = admin.NewConfig(s.cfg, s.GetLog(), s.dbToken)
+	s.adminLogout = admin.NewLogout(s.cfg, s.GetLog(), s.dbToken)
+	s.adminService = admin.NewService(s.cfg, s.GetLog(), s.dbToken)
+	s.adminApp = admin.NewApp(s.cfg, s.GetLog(), s.dbToken)
 
 	// 退出登陆
 	router.POST(path.Path("/logout"), s.adminLogout.Logout, s.adminLogout.LogoutDoc)
@@ -40,6 +31,9 @@ func (s *innerRouter) mapAdminApi(path types.Path, router *router.Router) {
 	router.POST(path.Path("/sys/host"), s.adminSys.GetHost, s.adminSys.GetHostDoc)
 	router.POST(path.Path("/sys/network/interfaces"), s.adminSys.GetNetworkInterfaces, s.adminSys.GetNetworkInterfacesDoc)
 	router.POST(path.Path("/sys/disk/partitions"), s.adminSys.GetDiskPartitions, s.adminSys.GetDiskPartitionsDoc)
+
+	// 服务
+	router.POST(path.Path("/svc/info"), s.adminService.GetInfo, s.adminService.GetInfoDoc)
 
 	// APP
 	router.POST(path.Path("/app/upload"), s.adminApp.Upload, nil)

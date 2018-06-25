@@ -6,12 +6,23 @@ import (
 	"github.com/ktpswjz/httpserver/router"
 	"github.com/ktpswjz/httpserver/document"
 	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
+	"github.com/ktpswjz/httpserver/example/webserver/server/config"
+	"github.com/ktpswjz/httpserver/types"
+	"github.com/ktpswjz/httpserver/example/webserver/database/memory"
 )
 
 type Logout struct {
 	controller.Base
 }
 
+func NewLogout(cfg *config.Config, log types.Log, dbToken memory.Token) *Logout  {
+	instance := &Logout{}
+	instance.Config = cfg
+	instance.SetLog(log)
+	instance.DbToken = dbToken
+
+	return instance
+}
 
 func (s *Logout) Logout(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant) {
 	token, err := s.DbToken.Get(a.Token())

@@ -22,7 +22,7 @@ type Admin struct {
 func (s *Admin) GetInfo(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant)  {
 	data := &model.SysInfo {
 		Name: s.Config.Name,
-		BackVersion: s.Config.GetVersion().ToString(),
+		BackVersion: s.Config.GetArgs().ModuleVersion().ToString(),
 	}
 	a.Success(data)
 }

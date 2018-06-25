@@ -110,7 +110,7 @@ func init() {
 		fmt.Println(cfg.FormatString())
 		os.Exit(0)
 	}
-	cfg.SetVersion(moduleArgs.ModuleVersion())
+	cfg.SetArgs(moduleArgs)
 
 	if cfg.Server.Https.Enabled {
 		certFilePath := cfg.Server.Https.Cert.File
