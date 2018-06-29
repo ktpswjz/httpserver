@@ -9,6 +9,7 @@ import (
 	"github.com/ktpswjz/httpserver/document"
 	"github.com/ktpswjz/httpserver/example/webserver/database/memory"
 	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
+	"time"
 )
 
 const (
@@ -92,6 +93,7 @@ func (s *innerRouter) PreRouting(w http.ResponseWriter, r *http.Request, a route
 			a.Error(errors.AuthTokenIllegal)
 			return true
 		}
+		tokenEntity.ActiveTime = time.Now()
 	}
 
 	// default to admin site
