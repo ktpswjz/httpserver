@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"fmt"
 	"os"
+	"os/exec"
 )
 
 type ArgsParser interface {
@@ -98,4 +99,35 @@ func (s *Args) ModuleRemark() string  {
 
 func (s *Args) ModuleVersion() *Version  {
 	return &s.moduleVersion
+}
+
+func (s *Args) ParseNew(path string) (*Args, error)  {
+	out, err := exec.Command(path, "--version").Output()
+	if err != nil {
+		return nil, err
+	}
+	args := &Args{modulePath: path}
+	if !args.moduleVersion.Parse(string(out[:])) {
+		return nil, fmt.Errorf("invalid version: %s", string(out[:]))
+	}
+
+	out, err = exec.Command(path, "--type").Output()
+	if err != nil {
+		return nil, err
+	}
+	args.moduleType = string(out[:])
+
+	out, err = exec.Command(path, "--module").Output()
+	if err != nil {
+		return nil, err
+	}
+	args.moduleName = string(out[:])
+
+	out, err = exec.Command(path, "--remark").Output()
+	if err != nil {
+		return nil, err
+	}
+	args.moduleRemark = string(out[:])
+
+	return args, nil
 }
