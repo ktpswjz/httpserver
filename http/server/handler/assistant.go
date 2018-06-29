@@ -32,7 +32,9 @@ type Assistant struct {
 }
 
 func (s *Assistant) CanUpdate() bool {
-	if runtime.GOOS == "linux" {
+	if s.restart == nil {
+		return false
+	} else if runtime.GOOS == "linux" {
 		return true
 	} else {
 		return false
