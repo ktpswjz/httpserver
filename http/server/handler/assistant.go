@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"github.com/ktpswjz/httpserver/id"
+	"runtime"
 )
 
 type Assistant struct {
@@ -28,6 +29,22 @@ type Assistant struct {
 	enterTime time.Time
 	transferTime time.Time
 	leaveTime time.Time
+}
+
+func (s *Assistant) CanUpdate() bool {
+	if runtime.GOOS == "linux" {
+		return true
+	} else {
+		return false
+	}
+}
+
+func (s *Assistant) CanRestart() bool {
+	if s.restart == nil {
+		return false
+	} else {
+		return true
+	}
 }
 
 func (s *Assistant) Restart() error {

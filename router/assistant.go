@@ -7,6 +7,8 @@ import (
 )
 
 type Assistant interface {
+	CanUpdate() bool
+	CanRestart() bool
 	Restart() error
 	GetBody(r *http.Request) ([]byte, error)
 	GetArgument(r *http.Request, v interface{}) error
