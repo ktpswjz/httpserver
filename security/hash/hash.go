@@ -37,7 +37,7 @@ func ToHash(hash string) []byte {
 	return hashed
 }
 
-func Hash(data string, format int64) (string, error) {
+func Hash(data string, format uint64) (string, error) {
 	if len(data) < 1 {
 		return data, nil
 	}
