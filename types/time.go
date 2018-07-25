@@ -1,15 +1,23 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type Time time.Time
 
 const (
 	timeFormart = "2006-01-02 15:04:05"
+	dateFormart = "2006-01-02"
 )
 
 func (t *Time) UnmarshalJSON(data []byte) (err error) {
-	now, err := time.ParseInLocation(`"`+timeFormart+`"`, string(data), time.Local)
+	format := timeFormart
+	if len(data) == len(dateFormart) + 2 {
+		format = dateFormart
+	}
+
+	now, err := time.ParseInLocation(`"`+format+`"`, string(data), time.Local)
 	*t = Time(now)
 	return
 }
