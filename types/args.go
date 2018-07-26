@@ -36,7 +36,7 @@ func (s *Args) Parse(args []string, moduleType, moduleName, moduleVersion, modul
 
 	s.modulePath = args[0]
 	absModulePath, err := filepath.Abs(args[0])
-	if err != nil {
+	if err == nil {
 		s.modulePath = absModulePath
 	}
 
