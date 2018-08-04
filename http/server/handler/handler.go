@@ -74,6 +74,7 @@ func (s *innerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	a.path = r.URL.Path
 	s.router.ServeHTTP2(w, r, a)
 
 	if s.handle != nil {
@@ -89,6 +90,7 @@ func (s *innerHandler) newAssistant(w http.ResponseWriter, r *http.Request) *Ass
 	if r.TLS != nil {
 		instance.schema = "https"
 	}
+	instance.keys = make(map[string]interface{})
 	instance.record = false
 	instance.enterTime = time.Now()
 	instance.path = r.URL.Path

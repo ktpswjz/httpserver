@@ -23,9 +23,11 @@ type Assistant struct {
 	randKey *rsakey.Private
 	restart func() error
 
+	keys map[string]interface{}
 	record bool
 	input []byte
 	output []byte
+	outputCode *int
 	enterTime time.Time
 	transferTime time.Time
 	leaveTime time.Time
@@ -69,6 +71,7 @@ func (s *Assistant) OutputJson(code int, data interface{}, errSummary string, er
 	if s.response == nil {
 		return
 	}
+	s.outputCode = &code
 
 	result := &types.Result{
 		Code: code,
@@ -101,6 +104,41 @@ func (s *Assistant) GetArgument(r *http.Request, v interface{}) error {
 	return json.NewDecoder(r.Body).Decode(v)
 }
 
+func (s *Assistant) IsError() bool  {
+	if s.outputCode == nil {
+		return false
+	}
+
+	if *s.outputCode == 0 {
+		return false
+	}
+
+	return true
+}
+
+func (s *Assistant) Set(key string, val interface{})  {
+	s.keys[key] = val
+}
+
+func (s *Assistant) Get(key string) (interface{}, bool)  {
+	val, ok := s.keys[key]
+	if ok {
+		return val, true
+	} else {
+		return nil, false
+	}
+}
+
+func (s *Assistant) Del(key string) bool  {
+	_, ok := s.keys[key]
+	if ok {
+		delete(s.keys, key)
+		return true
+	} else {
+		return false
+	}
+}
+
 func (s *Assistant) SetRecord(v bool) {
 	s.record = v
 }
@@ -125,12 +163,21 @@ func (s *Assistant) Schema() string {
 	return s.schema
 }
 
+func (s *Assistant) Path() string {
+	return s.path
+}
 func (s *Assistant) RID() uint64  {
 	return s.rid
 }
 
 func (s *Assistant) RIP() string  {
 	return s.rip
+}
+func (s *Assistant) EnterTime() time.Time  {
+	return s.enterTime
+}
+func (s *Assistant) LeaveTime() time.Time  {
+	return s.leaveTime
 }
 
 func (s *Assistant) Token() string  {
