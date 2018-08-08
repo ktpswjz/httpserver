@@ -101,7 +101,12 @@ func (s *Assistant) GetBody(r *http.Request) ([]byte, error) {
 }
 
 func (s *Assistant) GetArgument(r *http.Request, v interface{}) error {
-	return json.NewDecoder(r.Body).Decode(v)
+	err := json.NewDecoder(r.Body).Decode(v)
+	if err == nil {
+		s.input, _ = json.Marshal(v)
+	}
+
+	return err
 }
 
 func (s *Assistant) IsError() bool  {
