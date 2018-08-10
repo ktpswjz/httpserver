@@ -59,7 +59,6 @@ func Encode(secret, algorithm string, payload interface{}) (string, error)  {
 	return fmt.Sprintf("%s.%s", msg, signature), nil
 }
 
-
 func Verify(jwt, secret string) error  {
 	header := &Header{}
 	values, err := Decode(jwt, nil, header)
@@ -78,6 +77,7 @@ func Verify(jwt, secret string) error  {
 
 	return nil
 }
+
 
 func sign(secret, algorithm, msg string) (string, error)  {
 	key := []byte(secret)
