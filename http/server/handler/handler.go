@@ -56,6 +56,10 @@ func (s *innerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		", method=", r.Method,
 		", path=", a.path)
 
+	defer func(a *Assistant) {
+		s.postRouting(a)
+	}(a)
+
 	// 异常处理
 	defer func(a *Assistant) {
 		if err := recover(); err != nil {
@@ -77,6 +81,22 @@ func (s *innerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	a.path = r.URL.Path
 	s.router.ServeHTTP2(w, r, a)
+
+	//if s.handle != nil {
+	//	a.leaveTime = time.Now()
+	//	go func(a *Assistant) {
+	//		s.handle.PostRouting(a)
+	//	}(a)
+	//}
+}
+
+func (s *innerHandler)  postRouting(a *Assistant) {
+	// 异常处理
+	defer func() {
+		if err := recover(); err != nil {
+			s.LogError("postRouting", err)
+		}
+	}()
 
 	if s.handle != nil {
 		a.leaveTime = time.Now()
