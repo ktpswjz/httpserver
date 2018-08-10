@@ -3,7 +3,7 @@ package jwt
 import "testing"
 
 func TestJwt_Encode(t *testing.T) {
-	jwt := New("HS256", "your-256-bit-secret")
+	jwt := NewEncoding("HS256", "your-256-bit-secret")
 
 	payload := &Payload{
 		Sub: "1234567890",
@@ -26,7 +26,7 @@ func TestJwt_Encode(t *testing.T) {
 }
 
 func TestJwt_Decode(t *testing.T) {
-	jwt := New("HS384", "your-384-bit-secret")
+	jwt := NewEncoding("HS384", "your-384-bit-secret")
 	//payload := &Payload{
 	//	Sub: "11",
 	//	Name: "22",

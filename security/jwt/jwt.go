@@ -11,41 +11,64 @@ import (
 	"encoding/json"
 )
 
-type JWT interface {
-	Encode(payload interface{}) (string, error)
-	Decode(value string, payload interface{}) error
-}
-
-func New(algorithm, secret string) JWT  {
-	return &jwt{
-		algorithm: algorithm,
-		secret: secret,
-	}
-}
-
-type jwt struct {
-	algorithm	string
-	secret		string
-}
-
-func (s *jwt) Decode(value string, payload interface{}) error {
-	// header.payload.signature
-	values := strings.Split(value, ".")
+func Decode(jwt string, payload, header interface{}) ([]string, error)  {
+	// jwt: header.payload.signature
+	values := strings.Split(jwt, ".")
 	if len(values) != 3 {
-		return fmt.Errorf("invalid format")
+		return nil, fmt.Errorf("invalid format")
 	}
 
-	headerData, err := base64.URLEncoding.DecodeString(values[0])
-	if err != nil {
-		return fmt.Errorf("invalid format, decode header fail: %s", err.Error())
+	if header != nil {
+		err := unmarshal(values[0], header)
+		if err != nil {
+			return nil, fmt.Errorf("invalid hearder: %s", err.Error())
+		}
 	}
+
+	if payload != nil {
+		err := unmarshal(values[1], payload)
+		if err != nil {
+			return nil, fmt.Errorf("invalid hearder: %s", err.Error())
+		}
+	}
+
+	return values, nil
+}
+
+func Encode(secret, algorithm string, payload interface{}) (string, error)  {
+	header := &Header{
+		Algorithm: algorithm,
+		Type: "JWT",
+	}
+
+	headerBase64, err := marshal(header)
+	if err != nil {
+		return "", err
+	}
+	payloadBase64, err := marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	msg := fmt.Sprintf("%s.%s", headerBase64, payloadBase64)
+	signature, err := sign(secret, algorithm, msg)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s.%s", msg, signature), nil
+}
+
+
+func Verify(jwt, secret string) error  {
 	header := &Header{}
-	err = json.Unmarshal(headerData, header)
+	values, err := Decode(jwt, nil, header)
 	if err != nil {
-		return fmt.Errorf("invalid format, unmarshal header fail: %s", err.Error())
+		return err
 	}
-	headerAndPayload := fmt.Sprintf("%s.%s", values[0], values[1])
-	signature, err := s.sign(s.secret, s.algorithm, headerAndPayload)
+
+	msg := fmt.Sprintf("%s.%s", values[0], values[1])
+	signature, err := sign(secret, header.Algorithm, msg)
 	if err != nil {
 		return fmt.Errorf("sign fail: %s", err.Error())
 	}
@@ -53,37 +76,10 @@ func (s *jwt) Decode(value string, payload interface{}) error {
 		return fmt.Errorf("invalid signature")
 	}
 
-	payloadData, err := base64.URLEncoding.DecodeString(values[1])
-	if err != nil {
-		return fmt.Errorf("invalid format, decode payload fail: %s", err.Error())
-	}
-	err = json.Unmarshal(payloadData, payload)
-	if err != nil {
-		return fmt.Errorf("invalid format, unmarshal payloadData fail: %s", err.Error())
-	}
-
 	return nil
 }
 
-func (s *jwt) Encode(payload interface{}) (string, error)  {
-	payloadData, err := json.Marshal(payload)
-	if err != nil {
-		return "", fmt.Errorf("invalid payload: %s", err.Error())
-	}
-	header := &Header{
-		Algorithm: s.algorithm,
-		Type: "JWT",
-	}
-	headerAndPayload := fmt.Sprintf("%s.%s", header.String(), base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(payloadData))
-	signature, err := s.sign(s.secret, s.algorithm, headerAndPayload)
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%s.%s", headerAndPayload, signature), nil
-}
-
-func (s *jwt) sign(secret, algorithm, headerAndPayload string) (string, error)  {
+func sign(secret, algorithm, msg string) (string, error)  {
 	key := []byte(secret)
 	var h hash.Hash = nil
 	if strings.ToUpper(algorithm) == "HS256" {
@@ -97,8 +93,30 @@ func (s *jwt) sign(secret, algorithm, headerAndPayload string) (string, error)  
 	if h == nil {
 		return "", fmt.Errorf("algorithm '%s' not support", algorithm)
 	}
-	h.Write([]byte(headerAndPayload))
+	h.Write([]byte(msg))
 	bytes := h.Sum(nil)
 
-	return base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(bytes), nil
+	return toBase64(bytes), nil
+}
+
+func toBase64(src []byte) string {
+	return base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(src)
+}
+
+func unmarshal(base64Val string, val interface{}) error  {
+	data, err := base64.URLEncoding.DecodeString(base64Val)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(data, val)
+}
+
+func marshal(val interface{}) (string, error)  {
+	data, err := json.Marshal(val)
+	if err != nil {
+		return "", err
+	}
+
+	return toBase64(data), nil
 }
