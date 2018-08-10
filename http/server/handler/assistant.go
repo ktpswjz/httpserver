@@ -14,6 +14,7 @@ import (
 
 type Assistant struct {
 	response http.ResponseWriter
+	method string
 	schema string
 	path string
 	rid uint64
@@ -27,6 +28,7 @@ type Assistant struct {
 	record bool
 	input []byte
 	output []byte
+	param []byte
 	outputCode *int
 	enterTime time.Time
 	transferTime time.Time
@@ -162,6 +164,14 @@ func (s *Assistant) GetInput() []byte  {
 
 func (s *Assistant) GetOutput() []byte  {
 	return s.output
+}
+
+func (s *Assistant) GetParam() []byte  {
+	return s.param
+}
+
+func (s *Assistant) Method() string {
+	return s.method
 }
 
 func (s *Assistant) Schema() string {

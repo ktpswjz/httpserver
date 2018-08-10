@@ -26,6 +26,8 @@ type Assistant interface {
 	SetInput(v []byte)
 	GetInput() []byte
 	GetOutput() []byte
+	GetParam() []byte
+	Method() string
 	Schema() string
 	Path() string
 	RID() uint64

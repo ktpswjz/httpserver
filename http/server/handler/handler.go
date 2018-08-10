@@ -8,6 +8,7 @@ import (
 	"github.com/ktpswjz/httpserver/security/rsakey"
 	"time"
 	"net"
+	"encoding/json"
 )
 
 type Handler interface {
@@ -87,6 +88,7 @@ func (s *innerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *innerHandler) newAssistant(w http.ResponseWriter, r *http.Request) *Assistant {
 	instance := &Assistant {response: w, schema: "http"}
+	instance.method = r.Method
 	if r.TLS != nil {
 		instance.schema = "https"
 	}
@@ -103,6 +105,17 @@ func (s *innerHandler) newAssistant(w http.ResponseWriter, r *http.Request) *Ass
 		if r.Method == "GET" {
 			instance.token = r.FormValue("token")
 		}
+	}
+	if len(r.URL.Query()) > 0 {
+		params := make([]*types.Query, 0)
+		for k, v := range r.URL.Query() {
+			param := &types.Query{Key: k}
+			if len(v) > 0 {
+				param.Value = v[0]
+			}
+			params = append(params, param)
+		}
+		instance.param, _ = json.Marshal(params)
 	}
 
 	return instance
