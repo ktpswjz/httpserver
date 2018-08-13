@@ -35,6 +35,7 @@ type Assistant interface {
 	EnterTime() time.Time
 	LeaveTime() time.Time
 	Token() string
+	JsonWebToken() string
 	ClientKey() *rsakey.Public
 	RandKey() *rsakey.Private
 	GenerateGuid() string

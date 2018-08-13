@@ -20,6 +20,7 @@ type Assistant struct {
 	rid uint64
 	rip string
 	token string
+	jwt string
 	clientKey *rsakey.Public
 	randKey *rsakey.Private
 	restart func() error
@@ -197,6 +198,10 @@ func (s *Assistant) LeaveTime() time.Time  {
 
 func (s *Assistant) Token() string  {
 	return s.token
+}
+
+func (s *Assistant) JsonWebToken() string  {
+	return s.jwt
 }
 
 func (s *Assistant) ClientKey() *rsakey.Public  {

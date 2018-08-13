@@ -9,6 +9,7 @@ import (
 	"time"
 	"net"
 	"encoding/json"
+	"strings"
 )
 
 type Handler interface {
@@ -132,6 +133,9 @@ func (s *innerHandler) newAssistant(w http.ResponseWriter, r *http.Request) *Ass
 			param := &types.Query{Key: k}
 			if len(v) > 0 {
 				param.Value = v[0]
+				if strings.ToLower(k) == "jwt" {
+					instance.jwt = v[0]
+				}
 			}
 			params = append(params, param)
 		}
