@@ -38,3 +38,13 @@ func (t Time) MarshalJSON() ([]byte, error) {
 func (t Time) String() string {
 	return time.Time(t).Format(timeFormat)
 }
+
+func (t *Time) ToDate(plusDays int) *time.Time  {
+	date := time.Time(*t)
+	date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+	if plusDays != 0 {
+		date = date.AddDate(0, 0, plusDays)
+	}
+
+	return &date
+}
