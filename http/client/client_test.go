@@ -9,7 +9,7 @@ func TestClient_PostJson(t *testing.T) {
 		Name: "Json",
 	}
 	client := &Client{}
-	input, output, _, err := client.PostJson(url, argument)
+	input, output, _, _,  err := client.PostJson(url, argument)
 	if err != nil {
 		t.Fatal(err)
 	}

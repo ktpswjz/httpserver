@@ -17,7 +17,7 @@ type Client struct {
 	Timeout		int64				// timeout in seconds unit, zero meas not timeout
 }
 
-func (s *Client) PostJson(url string, argument interface{}) ([]byte, []byte, *tls.ConnectionState, error)  {
+func (s *Client) PostJson(url string, argument interface{}) ([]byte, []byte, *tls.ConnectionState, int, error)  {
 	var input []byte = nil
 	var body io.Reader = nil
 	if argument != nil {
@@ -28,7 +28,7 @@ func (s *Client) PostJson(url string, argument interface{}) ([]byte, []byte, *tl
 		default:
 			bodyData, err := json.Marshal(argument)
 			if err != nil {
-				return bodyData, nil, nil, err
+				return bodyData, nil, nil, 0, err
 			}
 			body = bytes.NewBuffer([]byte(bodyData))
 			input = bodyData
@@ -46,15 +46,16 @@ func (s *Client) PostJson(url string, argument interface{}) ([]byte, []byte, *tl
 
 	resp, err := client.Post(url, "application/json;charset=utf-8", body)
 	if err != nil {
-		return input, nil, nil, err
+		return input, nil, nil, 0, err
 	}
 	defer resp.Body.Close()
+
 	bodyData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return input, nil, nil, err
+		return input, nil, nil, resp.StatusCode, err
 	}
 
-	return input, bodyData, resp.TLS, nil
+	return input, bodyData, resp.TLS, resp.StatusCode, nil
 }
 
 func (s *Client) Download(url string, argument interface{}) ([]byte, *tls.ConnectionState, error) {
