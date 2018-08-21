@@ -28,7 +28,7 @@ func Decode(jwt string, payload, header interface{}) ([]string, error)  {
 	if payload != nil {
 		err := unmarshal(values[1], payload)
 		if err != nil {
-			return nil, fmt.Errorf("invalid hearder: %s", err.Error())
+			return nil, fmt.Errorf("invalid payload: %s", err.Error())
 		}
 	}
 
@@ -106,7 +106,10 @@ func toBase64(src []byte) string {
 func unmarshal(base64Val string, val interface{}) error  {
 	data, err := base64.URLEncoding.DecodeString(base64Val)
 	if err != nil {
-		return err
+		data, err = base64.URLEncoding.WithPadding(base64.NoPadding).DecodeString(base64Val)
+		if err != nil {
+			return err
+		}
 	}
 
 	return json.Unmarshal(data, val)

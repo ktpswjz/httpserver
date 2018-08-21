@@ -52,6 +52,12 @@ func TestJwt_Decode(t *testing.T) {
 	if payload.Iat != 44 {
 		t.Error("Invalid Signature")
 	}
+
+	value = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJWSUNPLkhCUC5TRVJWSUNFIiwic3ViIjoiVklDTy5IQlAuU0VSVklDRSIsImF1ZCI6Im9yZ2FuSWQiLCJleHAiOjE1MzQ4MzIwMzYyMzYsIm5iZiI6MTUzNDgzMTQzNjIzNiwiaWF0IjoxNTM0ODMxNDM2MjM2LCJqdGkiOiI5MWMzN2IxMi1lNmZkLTQ2ODItYjY4NC1iMDFiOTE4MDkwMTIifQ.em_1Nvo6J5MNljBAZHf6nDSL-hU56_aS_icjqLyvvCw"
+	_, err = Decode(value, payload, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 type Payload struct {
