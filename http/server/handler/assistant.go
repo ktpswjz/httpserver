@@ -1,39 +1,40 @@
 package handler
 
 import (
-	"net/http"
-	"github.com/ktpswjz/httpserver/security/rsakey"
-	"time"
-	"github.com/ktpswjz/httpserver/types"
-	"fmt"
-	"io/ioutil"
 	"encoding/json"
+	"encoding/xml"
+	"fmt"
 	"github.com/ktpswjz/httpserver/id"
+	"github.com/ktpswjz/httpserver/security/rsakey"
+	"github.com/ktpswjz/httpserver/types"
+	"io/ioutil"
+	"net/http"
 	"runtime"
+	"time"
 )
 
 type Assistant struct {
-	response http.ResponseWriter
-	method string
-	schema string
-	path string
-	rid uint64
-	rip string
-	token string
-	jwt string
+	response  http.ResponseWriter
+	method    string
+	schema    string
+	path      string
+	rid       uint64
+	rip       string
+	token     string
+	jwt       string
 	clientKey *rsakey.Public
-	randKey *rsakey.Private
-	restart func() error
+	randKey   *rsakey.Private
+	restart   func() error
 
-	keys map[string]interface{}
-	record bool
-	input []byte
-	output []byte
-	param []byte
-	outputCode *int
-	enterTime time.Time
+	keys         map[string]interface{}
+	record       bool
+	input        []byte
+	output       []byte
+	param        []byte
+	outputCode   *int
+	enterTime    time.Time
 	transferTime time.Time
-	leaveTime time.Time
+	leaveTime    time.Time
 }
 
 func (s *Assistant) CanUpdate() bool {
@@ -77,13 +78,13 @@ func (s *Assistant) OutputJson(code int, data interface{}, errSummary string, er
 	s.outputCode = &code
 
 	result := &types.Result{
-		Code: code,
-		Data: data,
+		Code:   code,
+		Data:   data,
 		Elapse: time.Now().Sub(s.enterTime).String(),
 		Serial: s.rid,
-		Error: types.ResultError {
+		Error: types.ResultError{
 			Summary: errSummary,
-			Detail: fmt.Sprint(errDetails...),
+			Detail:  fmt.Sprint(errDetails...),
 		},
 	}
 
@@ -112,7 +113,16 @@ func (s *Assistant) GetArgument(r *http.Request, v interface{}) error {
 	return err
 }
 
-func (s *Assistant) IsError() bool  {
+func (s *Assistant) GetXml(r *http.Request, v interface{}) error {
+	err := xml.NewDecoder(r.Body).Decode(v)
+	if err == nil {
+		s.input, _ = xml.Marshal(v)
+	}
+
+	return err
+}
+
+func (s *Assistant) IsError() bool {
 	if s.outputCode == nil {
 		return false
 	}
@@ -124,11 +134,11 @@ func (s *Assistant) IsError() bool  {
 	return true
 }
 
-func (s *Assistant) Set(key string, val interface{})  {
+func (s *Assistant) Set(key string, val interface{}) {
 	s.keys[key] = val
 }
 
-func (s *Assistant) Get(key string) (interface{}, bool)  {
+func (s *Assistant) Get(key string) (interface{}, bool) {
 	val, ok := s.keys[key]
 	if ok {
 		return val, true
@@ -137,7 +147,7 @@ func (s *Assistant) Get(key string) (interface{}, bool)  {
 	}
 }
 
-func (s *Assistant) Del(key string) bool  {
+func (s *Assistant) Del(key string) bool {
 	_, ok := s.keys[key]
 	if ok {
 		delete(s.keys, key)
@@ -151,23 +161,23 @@ func (s *Assistant) SetRecord(v bool) {
 	s.record = v
 }
 
-func (s *Assistant) GetRecord() bool  {
+func (s *Assistant) GetRecord() bool {
 	return s.record
 }
 
-func (s *Assistant) SetInput(v []byte)  {
+func (s *Assistant) SetInput(v []byte) {
 	s.input = v
 }
 
-func (s *Assistant) GetInput() []byte  {
+func (s *Assistant) GetInput() []byte {
 	return s.input
 }
 
-func (s *Assistant) GetOutput() []byte  {
+func (s *Assistant) GetOutput() []byte {
 	return s.output
 }
 
-func (s *Assistant) GetParam() []byte  {
+func (s *Assistant) GetParam() []byte {
 	return s.param
 }
 
@@ -182,29 +192,29 @@ func (s *Assistant) Schema() string {
 func (s *Assistant) Path() string {
 	return s.path
 }
-func (s *Assistant) RID() uint64  {
+func (s *Assistant) RID() uint64 {
 	return s.rid
 }
 
-func (s *Assistant) RIP() string  {
+func (s *Assistant) RIP() string {
 	return s.rip
 }
-func (s *Assistant) EnterTime() time.Time  {
+func (s *Assistant) EnterTime() time.Time {
 	return s.enterTime
 }
-func (s *Assistant) LeaveTime() time.Time  {
+func (s *Assistant) LeaveTime() time.Time {
 	return s.leaveTime
 }
 
-func (s *Assistant) Token() string  {
+func (s *Assistant) Token() string {
 	return s.token
 }
 
-func (s *Assistant) JsonWebToken() string  {
+func (s *Assistant) JsonWebToken() string {
 	return s.jwt
 }
 
-func (s *Assistant) ClientKey() *rsakey.Public  {
+func (s *Assistant) ClientKey() *rsakey.Public {
 	return s.clientKey
 }
 

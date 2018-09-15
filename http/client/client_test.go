@@ -1,15 +1,57 @@
 package client
 
-import "testing"
+import (
+	"encoding/xml"
+	"testing"
+)
 
 func TestClient_PostJson(t *testing.T) {
-	url := "http://172.16.99.181/auth/rsa/key/public"
+	url := "http://localhost:8080/doc.api/test/api"
 	argument := &inputArgument{
-		ID: 11,
+		ID:   11,
 		Name: "Json",
 	}
 	client := &Client{}
-	input, output, _, _,  err := client.PostJson(url, argument)
+	input, output, _, _, err := client.PostJson(url, argument)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("input: ", string(input[:]))
+	t.Log("output:", string(output[:]))
+}
+
+func TestClient_PostXml(t *testing.T) {
+	url := "http://localhost:8080/doc.api/test/api"
+	argument := &inputArgument{
+		ID:   11,
+		Name: "Xml",
+	}
+	client := &Client{}
+	input, output, _, _, err := client.PostXml(url, argument)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("input: ", string(input[:]))
+	t.Log("output:", string(output[:]))
+
+	argument.Name = "Xml-[]byte"
+	argumentData, err := xml.Marshal(argument)
+	if err != nil {
+		t.Fatal(err)
+	}
+	input, output, _, _, err = client.PostXml(url, argumentData)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("input: ", string(input[:]))
+	t.Log("output:", string(output[:]))
+
+	argument.Name = "Xml-string"
+	argumentData, err = xml.Marshal(argument)
+	if err != nil {
+		t.Fatal(err)
+	}
+	input, output, _, _, err = client.PostXml(url, string(argumentData))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -18,6 +60,7 @@ func TestClient_PostJson(t *testing.T) {
 }
 
 type inputArgument struct {
-	ID   uint64 `json:"id"`
-	Name string `json:"name"`
+	ID      uint64   `json:"id" xml:"id"`
+	Name    string   `json:"name" xml:"name"`
+	XMLName struct{} `json:"-" xml:"argument"`
 }

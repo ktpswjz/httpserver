@@ -1,16 +1,17 @@
 package doc
 
 import (
-	"github.com/ktpswjz/httpserver/document"
-	"net/http"
-	"github.com/ktpswjz/httpserver/router"
 	"fmt"
-	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
+	"github.com/ktpswjz/httpserver/document"
 	"github.com/ktpswjz/httpserver/example/webserver/model"
-	"strings"
-	"time"
 	"github.com/ktpswjz/httpserver/example/webserver/server/config"
 	"github.com/ktpswjz/httpserver/example/webserver/server/controller"
+	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
+	"github.com/ktpswjz/httpserver/router"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"time"
 )
 
 type Doc struct {
@@ -18,8 +19,19 @@ type Doc struct {
 	Document document.Document
 }
 
-func (s *Doc) GetCatalogTree(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant)  {
-	filter := &model.CatalogFilter {
+func (s *Doc) TestApi(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
+	defer r.Body.Close()
+
+	w.Write(body)
+}
+
+func (s *Doc) GetCatalogTree(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant) {
+	filter := &model.CatalogFilter{
 		Keywords: "",
 	}
 	a.GetArgument(r, filter)
@@ -27,7 +39,7 @@ func (s *Doc) GetCatalogTree(w http.ResponseWriter, r *http.Request, p router.Pa
 	a.Success(s.Document.GetCatalogTree(filter.Keywords))
 }
 
-func (s *Doc) GetFunction(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant)  {
+func (s *Doc) GetFunction(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant) {
 	id := p.ByName("id")
 	fun := s.Document.GetFunction(id)
 	if fun == nil {
@@ -39,24 +51,24 @@ func (s *Doc) GetFunction(w http.ResponseWriter, r *http.Request, p router.Param
 	a.Success(fun)
 }
 
-func (s *Doc) CreateToken(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant)  {
+func (s *Doc) CreateToken(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant) {
 	filter := &model.TokenFilter{
 		Account: "",
 	}
 	err := a.GetArgument(r, filter)
 	if err != nil {
-		a.Error(errors.InputError,  err)
+		a.Error(errors.InputError, err)
 		return
 	}
 	account := strings.ToLower(strings.TrimSpace(filter.Account))
 	if account == "" {
-		a.Error(errors.InputInvalid,  "账号为空")
+		a.Error(errors.InputInvalid, "账号为空")
 		return
 	}
 
 	var user *config.SiteAdminUser = nil
 	userCount := len(s.Config.Site.Admin.Users)
-	for index := 0; index < userCount; index++  {
+	for index := 0; index < userCount; index++ {
 		if account == strings.ToLower(s.Config.Site.Admin.Users[index].Account) {
 			user = &s.Config.Site.Admin.Users[index]
 			break
@@ -64,21 +76,21 @@ func (s *Doc) CreateToken(w http.ResponseWriter, r *http.Request, p router.Param
 	}
 
 	if user == nil {
-		a.Error(errors.LoginAccountNotExit,  err)
+		a.Error(errors.LoginAccountNotExit, err)
 		return
 	}
 
 	now := time.Now()
 	token := &model.Token{
-		ID: a.GenerateGuid(),
+		ID:          a.GenerateGuid(),
 		UserAccount: user.Account,
-		LoginIP: a.RIP(),
-		LoginTime: now,
-		ActiveTime: now,
+		LoginIP:     a.RIP(),
+		LoginTime:   now,
+		ActiveTime:  now,
 	}
 	err = s.DbToken.Set(token)
 	if err != nil {
-		a.Error(errors.Exception,  err)
+		a.Error(errors.Exception, err)
 		return
 	}
 
