@@ -100,6 +100,36 @@ func (s *Assistant) OutputJson(code int, data interface{}, errSummary string, er
 	}
 }
 
+func (s *Assistant) OutputXml(data interface{}) {
+	if s.response == nil {
+		return
+	}
+
+	if data != nil {
+		switch data.(type) {
+		case []byte:
+			s.output = data.([]byte)
+		case string:
+			s.output = []byte(data.(string))
+		default:
+			bodyData, err := xml.MarshalIndent(data, "", "	")
+			if err != nil {
+				fmt.Fprint(s.response, err)
+				s.output = []byte(err.Error())
+				return
+			} else {
+				s.output = bodyData
+			}
+		}
+	}
+
+	s.response.Header().Add("Access-Control-Allow-Origin", "*")
+	s.response.Header().Set("Content-Type", "application/xml;charset=utf-8")
+	if len(s.output) > 0 {
+		s.response.Write(s.output)
+	}
+}
+
 func (s *Assistant) GetBody(r *http.Request) ([]byte, error) {
 	return ioutil.ReadAll(r.Body)
 }
@@ -107,17 +137,21 @@ func (s *Assistant) GetBody(r *http.Request) ([]byte, error) {
 func (s *Assistant) GetArgument(r *http.Request, v interface{}) error {
 	err := json.NewDecoder(r.Body).Decode(v)
 	if err == nil {
-		s.input, _ = json.Marshal(v)
+		s.input, err = json.Marshal(v)
 	}
 
 	return err
 }
 
 func (s *Assistant) GetXml(r *http.Request, v interface{}) error {
-	err := xml.NewDecoder(r.Body).Decode(v)
-	if err == nil {
-		s.input, _ = xml.Marshal(v)
+	bodyData, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
 	}
+	defer r.Body.Close()
+	s.input = bodyData
+
+	err = xml.Unmarshal(bodyData, v)
 
 	return err
 }

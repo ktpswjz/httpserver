@@ -85,6 +85,24 @@ func TestParse(t *testing.T) {
 	checkModel(t, model.Childs[1], "ArgumentBase", "base", "", false, 1)
 	checkModel(t, model.Childs[1].Childs[0], "string", "name", "名称", false, 0)
 
+	argument4 := Argument4{}
+	model = example.ParseModel(&argument4)
+	if model == nil {
+		t.Fatal("unkown")
+	}
+	if model.Type != "Argument4" {
+		t.Error("argument4 type: expect=", "Argument4", ", actual=", model.Type)
+	}
+	if len(model.Childs) != 1 {
+		t.Error("argument4 count: expect=", 1, ", actual=", len(model.Childs))
+	}
+	modelChild := model.Childs[0]
+	if modelChild.Name != "id" {
+		t.Error("argument4-0 name: expect=", "id", ", actual=", modelChild.Name)
+	}
+	if modelChild.Type != "*uint64" {
+		t.Error("argument4-0 type: expect=", "*uint64", ", actual=", modelChild.Type)
+	}
 }
 
 func TestParseOfSlice(t *testing.T) {
@@ -148,7 +166,6 @@ func TestParseOfSlice(t *testing.T) {
 	checkModel(t, model.Childs[0], "ArgumentBase", "", "", false, 1)
 	checkModel(t, model.Childs[0].Childs[0], "string", "name", "名称", false, 0)
 
-
 	var structSlice4 []ArgumentBase
 	model = example.ParseModel(&structSlice4)
 	if model == nil {
@@ -174,7 +191,7 @@ func TestParseOfSlice(t *testing.T) {
 	checkModel(t, model.Childs[4].Childs[0].Childs[0], "string", "name", "名称", false, 0)
 }
 
-func checkModel(t *testing.T, m *ModelArgument, argType, argName, argNote string, argRequired bool, argChildCount int)  {
+func checkModel(t *testing.T, m *ModelArgument, argType, argName, argNote string, argRequired bool, argChildCount int) {
 	if m.Type != argType {
 		t.Error("type: expect=", argType, ", actual=", m.Type)
 	}
@@ -199,10 +216,9 @@ type ArgumentBase struct {
 type Argument1 struct {
 	ArgumentBase
 
-	ID uint64 `json:"id" required:"true" note:"标识ID"`
+	ID  uint64      `json:"id" required:"true" note:"标识ID"`
 	Age interface{} `json:"age"`
 }
-
 
 type Argument2 struct {
 	ID uint64 `json:"id" required:"true" note:"标识ID2"`
@@ -213,7 +229,11 @@ type Argument2 struct {
 type Argument3 struct {
 	Argument2
 
-	ID3 uint64 `json:"id3" required:"false" note:"标识ID3"`
-	Addresses []string `json:"addresses" note:"地址"`
-	Names []*ArgumentBase `json:"names"`
+	ID3       uint64          `json:"id3" required:"false" note:"标识ID3"`
+	Addresses []string        `json:"addresses" note:"地址"`
+	Names     []*ArgumentBase `json:"names"`
+}
+
+type Argument4 struct {
+	ID *uint64 `json:"id,omitempty" required:"true" note:"标识"`
 }

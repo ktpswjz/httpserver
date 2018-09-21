@@ -17,6 +17,7 @@ type Assistant interface {
 	Success(data interface{})
 	Error(err types.Error, errDetails ...interface{})
 	OutputJson(code int, data interface{}, errSummary string, errDetails ...interface{})
+	OutputXml(data interface{})
 
 	IsError() bool
 	Set(key string, val interface{})

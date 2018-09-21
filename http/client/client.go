@@ -71,7 +71,7 @@ func (s *Client) PostXml(url string, argument interface{}) ([]byte, []byte, *tls
 			body = bytes.NewBufferString(argument.(string))
 			input = []byte(argument.(string))
 		default:
-			bodyData, err := xml.Marshal(argument)
+			bodyData, err := xml.MarshalIndent(argument, "", "	")
 			if err != nil {
 				return bodyData, nil, nil, 0, err
 			}

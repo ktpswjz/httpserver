@@ -1,12 +1,12 @@
 package document
 
 import (
-	"reflect"
 	"fmt"
+	"reflect"
+	"strings"
 )
 
 type Example struct {
-
 }
 
 func (s *Example) ParseModel(example interface{}) *ModelArgument {
@@ -19,10 +19,11 @@ func (s *Example) ParseModel(example interface{}) *ModelArgument {
 	exampleType := reflect.TypeOf(example)
 	exampleTypeKind := exampleType.Kind()
 	switch exampleTypeKind {
-	case reflect.Ptr : {
-		s.parseModel(reflect.ValueOf(example).Elem(), model)
-		break
-	}
+	case reflect.Ptr:
+		{
+			s.parseModel(reflect.ValueOf(example).Elem(), model)
+			break
+		}
 	case reflect.Interface,
 		reflect.Struct,
 		reflect.Array,
@@ -31,10 +32,11 @@ func (s *Example) ParseModel(example interface{}) *ModelArgument {
 		reflect.String,
 		reflect.Float32, reflect.Float64,
 		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64 : {
-		s.parseModel(reflect.ValueOf(example), model)
-		break
-	}
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		{
+			s.parseModel(reflect.ValueOf(example), model)
+			break
+		}
 	default:
 		return nil
 	}
@@ -42,7 +44,7 @@ func (s *Example) ParseModel(example interface{}) *ModelArgument {
 	return model
 }
 
-func (s *Example) parseModel(v reflect.Value, argument *ModelArgument)  {
+func (s *Example) parseModel(v reflect.Value, argument *ModelArgument) {
 	if argument == nil {
 		return
 	}
@@ -53,104 +55,119 @@ func (s *Example) parseModel(v reflect.Value, argument *ModelArgument)  {
 	t := v.Type()
 	k := t.Kind()
 	switch k {
-	case reflect.Ptr : {
-		s.parseModel(v.Elem(), argument)
-		break
-	}
-	case reflect.Interface: {
-		argument.Type = k.String()
-		if v.CanInterface() {
-			value := reflect.ValueOf(v.Interface())
-			if value.Kind() != reflect.Invalid {
-				s.parseModel(value, argument)
+	case reflect.Ptr:
+		{
+			s.parseModel(v.Elem(), argument)
+			break
+		}
+	case reflect.Interface:
+		{
+			argument.Type = k.String()
+			if v.CanInterface() {
+				value := reflect.ValueOf(v.Interface())
+				if value.Kind() != reflect.Invalid {
+					s.parseModel(value, argument)
+				}
 			}
+			break
 		}
-		break
-	}
-	case reflect.Struct : {
-		if argument.Type == "" {
-			argument.Type = t.Name()
-		}
-
-		n := v.NumField()
-		for i := 0; i < n; i++ {
-			valueField := v.Field(i)
-			if !valueField.CanInterface() {
-				continue
+	case reflect.Struct:
+		{
+			if argument.Type == "" {
+				argument.Type = t.Name()
 			}
 
-			typeField := t.Field(i)
-			if typeField.Anonymous {
-				if valueField.CanAddr() {
-					s.parseModel(valueField.Addr().Elem(), argument)
+			n := v.NumField()
+			for i := 0; i < n; i++ {
+				valueField := v.Field(i)
+				if !valueField.CanInterface() {
+					continue
+				}
+
+				typeField := t.Field(i)
+				if typeField.Anonymous {
+					if valueField.CanAddr() {
+						s.parseModel(valueField.Addr().Elem(), argument)
+					}
+				} else {
+					child := &ModelArgument{Childs: make([]*ModelArgument, 0)}
+					child.Name = typeField.Tag.Get("json")
+					if child.Name == "" {
+						child.Name = typeField.Name
+					}
+					cns := strings.Split(child.Name, ",")
+					if len(cns) > 1 {
+						child.Name = cns[0]
+					}
+					child.Type = valueField.Kind().String()
+					//child.Type = valueField.Type().String()
+					if typeField.Tag.Get("required") == "true" {
+						child.Required = true
+					}
+					child.Note = typeField.Tag.Get("note")
+					child.parent = argument
+					argument.Childs = append(argument.Childs, child)
+
+					value := reflect.ValueOf(valueField.Interface())
+					if value.Kind() != reflect.Invalid {
+						child.Type = value.Type().Name()
+						if child.Type == "" {
+							child.Type = valueField.Type().String()
+						}
+						s.parseModel(value, child)
+					}
+				}
+			}
+			break
+		}
+	case reflect.Array:
+		{
+			break
+		}
+	case reflect.Slice:
+		{
+			st := t.Elem()
+			stk := st.Kind()
+
+			var ste reflect.Type = nil
+			if stk == reflect.Ptr {
+				ste = st.Elem()
+			} else {
+				ste = st
+			}
+			if ste != nil {
+				argument.Type = fmt.Sprintf("%s[]", ste.Name())
+
+				if ste.Kind() == reflect.Struct && argument.ParentType() != ste.Name() {
+					stet := reflect.New(ste)
+					child := &ModelArgument{Childs: make([]*ModelArgument, 0)}
+					child.Type = ste.Name()
+					argument.Childs = append(argument.Childs, child)
+					s.parseModel(stet.Elem(), child)
 				}
 			} else {
-				child := &ModelArgument{Childs: make([]*ModelArgument, 0)}
-				child.Name = typeField.Tag.Get("json")
-				if child.Name == "" {
-					child.Name = typeField.Name
-				}
-				child.Type = valueField.Kind().String()
-				if typeField.Tag.Get("required") == "true" {
-					child.Required = true
-				}
-				child.Note = typeField.Tag.Get("note")
-				child.parent = argument
-				argument.Childs = append(argument.Childs, child)
-
-				value := reflect.ValueOf(valueField.Interface())
-				if value.Kind() != reflect.Invalid {
-					child.Type = value.Type().Name()
-					s.parseModel(value, child)
-				}
+				argument.Type = fmt.Sprintf("%s[]", stk.String())
 			}
-		}
-		break
-	}
-	case reflect.Array: {
-		break
-	}
-	case reflect.Slice: {
-		st := t.Elem()
-		stk := st.Kind()
 
-		var ste reflect.Type = nil
-		if stk == reflect.Ptr {
-			ste = st.Elem()
-		} else {
-			ste = st
-		}
-		if ste != nil {
-			argument.Type =  fmt.Sprintf("%s[]", ste.Name())
-
-			if ste.Kind() == reflect.Struct && argument.ParentType() != ste.Name() {
-				stet := reflect.New(ste)
-				child := &ModelArgument{Childs: make([]*ModelArgument, 0)}
-				child.Type = ste.Name()
-				argument.Childs = append(argument.Childs, child)
-				s.parseModel(stet.Elem(), child)
+			if argument.Type == "[]" {
+				argument.Type = fmt.Sprintf("%s[]", stk.String())
 			}
-		} else {
-			argument.Type = fmt.Sprintf("%s[]", stk.String())
-		}
 
-		if argument.Type == "[]" {
-			argument.Type =  fmt.Sprintf("%s[]", stk.String())
+			break
 		}
-
-		break
-	}
 	case reflect.Bool,
 		reflect.String,
 		reflect.Float32, reflect.Float64,
 		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64 : {
-		argument.Type = t.Name()
-		break
-	}
-	default: {
-		return
-	}
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		{
+			argument.Type = t.Name()
+			break
+		}
+	default:
+		{
+			return
+		}
 	}
 
 }
