@@ -59,6 +59,24 @@ func TestClient_PostXml(t *testing.T) {
 	t.Log("output:", string(output[:]))
 }
 
+func TestClient_PostSoap(t *testing.T) {
+	argument := &identity{
+		bodyData: bodyData{
+			XmlNs: "http://example.org/",
+		},
+		InputID: `{"username":"test1","password":"1"}`,
+	}
+	url := "http://localhost:8001/service.asmx"
+
+	client := &Client{}
+	input, output, _, _, err := client.PostSoap(url, argument)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("soap input: ", string(input[:]))
+	t.Log("soap output:", string(output[:]))
+}
+
 type inputArgument struct {
 	ID      uint64   `json:"id" xml:"id"`
 	Name    string   `json:"name" xml:"name"`

@@ -103,6 +103,45 @@ func (s *Client) PostXml(url string, argument interface{}) ([]byte, []byte, *tls
 	return input, bodyData, resp.TLS, resp.StatusCode, nil
 }
 
+func (s *Client) PostSoap(url string, argument interface{}) ([]byte, []byte, *tls.ConnectionState, int, error) {
+	soap := &Soap{
+		Xsi:    "http://www.w3.org/2001/XMLSchema-instance",
+		Xsd:    "http://www.w3.org/2001/XMLSchema",
+		Soap12: "http://www.w3.org/2003/05/soap-envelope",
+		Body: SoapBody{
+			Data: argument,
+		},
+	}
+
+	input, err := xml.MarshalIndent(soap, "", "	")
+	if err != nil {
+		return input, nil, nil, 0, err
+	}
+	body := bytes.NewBuffer([]byte(input))
+
+	client := &http.Client{}
+	if s.Transport != nil {
+		client.Transport = s.Transport
+	}
+	if s.Timeout > 0 {
+		timeout := s.Timeout * time.Second.Nanoseconds()
+		client.Timeout = time.Duration(timeout)
+	}
+
+	resp, err := client.Post(url, "application/soap+xml;charset=utf-8", body)
+	if err != nil {
+		return input, nil, nil, 0, err
+	}
+	defer resp.Body.Close()
+
+	bodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return input, nil, nil, resp.StatusCode, err
+	}
+
+	return input, bodyData, resp.TLS, resp.StatusCode, nil
+}
+
 func (s *Client) Download(url string, argument interface{}) ([]byte, *tls.ConnectionState, error) {
 	client := &http.Client{}
 	if s.Transport != nil {
