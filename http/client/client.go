@@ -18,6 +18,30 @@ type Client struct {
 	Timeout   int64           // timeout in seconds unit, zero meas not timeout
 }
 
+func (s *Client) Get(url string, argument interface{}) ([]byte, []byte, *tls.ConnectionState, int, error) {
+	client := &http.Client{}
+	if s.Transport != nil {
+		client.Transport = s.Transport
+	}
+	if s.Timeout > 0 {
+		timeout := s.Timeout * time.Second.Nanoseconds()
+		client.Timeout = time.Duration(timeout)
+	}
+
+	resp, err := client.Get(url)
+	if err != nil {
+		return nil, nil, nil, 0, err
+	}
+	defer resp.Body.Close()
+
+	bodyData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, nil, nil, resp.StatusCode, err
+	}
+
+	return nil, bodyData, resp.TLS, resp.StatusCode, nil
+}
+
 func (s *Client) PostJson(url string, argument interface{}) ([]byte, []byte, *tls.ConnectionState, int, error) {
 	var input []byte = nil
 	var body io.Reader = nil
