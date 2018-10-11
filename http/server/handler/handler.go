@@ -1,22 +1,22 @@
 package handler
 
 import (
-	"net/http"
-	"github.com/ktpswjz/httpserver/types"
-	"github.com/ktpswjz/httpserver/router"
-	"github.com/ktpswjz/httpserver/id"
-	"github.com/ktpswjz/httpserver/security/rsakey"
-	"time"
-	"net"
 	"encoding/json"
+	"github.com/ktpswjz/httpserver/id"
+	"github.com/ktpswjz/httpserver/router"
+	"github.com/ktpswjz/httpserver/security/rsakey"
+	"github.com/ktpswjz/httpserver/types"
+	"net"
+	"net/http"
 	"strings"
+	"time"
 )
 
 type Handler interface {
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
-func NewHandler(handle Handle, log types.Log, restart func() error) (Handler, error)  {
+func NewHandler(handle Handle, log types.Log, restart func() error) (Handler, error) {
 	privateKey := &rsakey.Private{}
 	err := privateKey.Create(1024)
 	if err != nil {
@@ -39,12 +39,12 @@ func NewHandler(handle Handle, log types.Log, restart func() error) (Handler, er
 
 type innerHandler struct {
 	types.Base
-	router *router.Router
-	handle Handle
-	requestId id.Generator
+	router      *router.Router
+	handle      Handle
+	requestId   id.Generator
 	sqlEntityId id.Generator
-	randKey *rsakey.Private
-	restart func() error
+	randKey     *rsakey.Private
+	restart     func() error
 }
 
 func (s *innerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +91,7 @@ func (s *innerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//}
 }
 
-func (s *innerHandler)  postRouting(a *Assistant) {
+func (s *innerHandler) postRouting(a *Assistant) {
 	// 异常处理
 	defer func() {
 		if err := recover(); err != nil {
@@ -102,13 +102,20 @@ func (s *innerHandler)  postRouting(a *Assistant) {
 	if s.handle != nil {
 		a.leaveTime = time.Now()
 		go func(a *Assistant) {
+			// 异常处理
+			defer func() {
+				if err := recover(); err != nil {
+					s.LogError("postRouting", err)
+				}
+			}()
+
 			s.handle.PostRouting(a)
 		}(a)
 	}
 }
 
 func (s *innerHandler) newAssistant(w http.ResponseWriter, r *http.Request) *Assistant {
-	instance := &Assistant {response: w, schema: "http"}
+	instance := &Assistant{response: w, schema: "http"}
 	instance.method = r.Method
 	if r.TLS != nil {
 		instance.schema = "https"
