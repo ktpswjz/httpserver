@@ -9,10 +9,10 @@ type Encoding interface {
 	Decode(value string, payload interface{}) error
 }
 
-func NewEncoding(algorithm, secret string) Encoding  {
+func NewEncoding(algorithm, secret string) Encoding {
 	return &encoding{
 		algorithm: algorithm,
-		secret: secret,
+		secret:    secret,
 	}
 }
 
@@ -44,4 +44,3 @@ func (s *encoding) Decode(jwt string, payload interface{}) error {
 func (s *encoding) Encode(payload interface{}) (string, error) {
 	return Encode(s.secret, s.algorithm, payload)
 }
-

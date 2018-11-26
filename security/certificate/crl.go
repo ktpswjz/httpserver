@@ -1,12 +1,12 @@
 package certificate
 
 import (
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"errors"
+	"io/ioutil"
 	"math/big"
 	"time"
-	"crypto/x509/pkix"
-	"io/ioutil"
-	"crypto/x509"
-	"errors"
 )
 
 type RevokedItem struct {

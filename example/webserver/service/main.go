@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/ktpswjz/httpserver/example/webserver/server/router"
-	"github.com/ktpswjz/httpserver/http/server/host"
 	"fmt"
 	"github.com/kardianos/service"
+	"github.com/ktpswjz/httpserver/example/webserver/server/router"
+	"github.com/ktpswjz/httpserver/http/server/host"
 )
 
 func main() {

@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/ktpswjz/httpserver/types"
 	"github.com/ktpswjz/httpserver/router"
+	"github.com/ktpswjz/httpserver/types"
 	"net/http"
 )
 

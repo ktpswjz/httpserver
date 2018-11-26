@@ -7,10 +7,10 @@ type Assistant interface {
 
 type innerAssistant struct {
 	catalogs []*innerCatalog
-	method string
+	method   string
 }
 
-func (s *innerAssistant) CreateCatalog(name, note string) Catalog  {
+func (s *innerAssistant) CreateCatalog(name, note string) Catalog {
 	catalog := &innerCatalog{}
 	catalog.name = name
 	catalog.note = note
@@ -19,9 +19,9 @@ func (s *innerAssistant) CreateCatalog(name, note string) Catalog  {
 	return catalog
 }
 
-func (s *innerAssistant) CreateFunction(name string) Function  {
+func (s *innerAssistant) CreateFunction(name string) Function {
 	function := &innerFunction{
-		name: name,
+		name:        name,
 		ignoreToken: false,
 	}
 	if s.method == "POST" {
@@ -36,4 +36,3 @@ func (s *innerAssistant) CreateFunction(name string) Function  {
 
 	return function
 }
-

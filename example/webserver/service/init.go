@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"github.com/kardianos/service"
 	"github.com/ktpswjz/httpserver/example/webserver/server/config"
 	"github.com/ktpswjz/httpserver/logger"
 	"github.com/ktpswjz/httpserver/types"
 	"os"
-	"fmt"
-	"github.com/kardianos/service"
 	"path/filepath"
 )
 
@@ -18,9 +18,9 @@ const (
 )
 
 var (
-	cfg = config.NewConfig()
-	log = &logger.Writer{Level: logger.LevelAll}
-	pro = &Program{}
+	cfg                 = config.NewConfig()
+	log                 = &logger.Writer{Level: logger.LevelAll}
+	pro                 = &Program{}
 	svc service.Service = nil
 )
 
@@ -31,7 +31,7 @@ func init() {
 
 	// service
 	svcCfg := &service.Config{
-		Name: moduleName,
+		Name:        moduleName,
 		DisplayName: moduleName,
 		Description: moduleRemark,
 	}

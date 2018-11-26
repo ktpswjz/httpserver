@@ -1,8 +1,8 @@
 package id
 
 import (
-	"sync"
 	"fmt"
+	"sync"
 )
 
 type innerUint64 struct {

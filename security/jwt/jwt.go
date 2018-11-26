@@ -3,15 +3,15 @@ package jwt
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"strings"
-	"hash"
 	"crypto/sha512"
-	"fmt"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"hash"
+	"strings"
 )
 
-func Decode(jwt string, payload, header interface{}) ([]string, error)  {
+func Decode(jwt string, payload, header interface{}) ([]string, error) {
 	// jwt: header.payload.signature
 	values := strings.Split(jwt, ".")
 	if len(values) != 3 {
@@ -35,10 +35,10 @@ func Decode(jwt string, payload, header interface{}) ([]string, error)  {
 	return values, nil
 }
 
-func Encode(secret, algorithm string, payload interface{}) (string, error)  {
+func Encode(secret, algorithm string, payload interface{}) (string, error) {
 	header := &Header{
 		Algorithm: algorithm,
-		Type: "JWT",
+		Type:      "JWT",
 	}
 
 	headerBase64, err := marshal(header)
@@ -59,7 +59,7 @@ func Encode(secret, algorithm string, payload interface{}) (string, error)  {
 	return fmt.Sprintf("%s.%s", msg, signature), nil
 }
 
-func Verify(jwt, secret string) error  {
+func Verify(jwt, secret string) error {
 	header := &Header{}
 	values, err := Decode(jwt, nil, header)
 	if err != nil {
@@ -78,8 +78,7 @@ func Verify(jwt, secret string) error  {
 	return nil
 }
 
-
-func sign(secret, algorithm, msg string) (string, error)  {
+func sign(secret, algorithm, msg string) (string, error) {
 	key := []byte(secret)
 	var h hash.Hash = nil
 	if strings.ToUpper(algorithm) == "HS256" {
@@ -103,7 +102,7 @@ func toBase64(src []byte) string {
 	return base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(src)
 }
 
-func unmarshal(base64Val string, val interface{}) error  {
+func unmarshal(base64Val string, val interface{}) error {
 	data, err := base64.URLEncoding.DecodeString(base64Val)
 	if err != nil {
 		data, err = base64.URLEncoding.WithPadding(base64.NoPadding).DecodeString(base64Val)
@@ -115,7 +114,7 @@ func unmarshal(base64Val string, val interface{}) error  {
 	return json.Unmarshal(data, val)
 }
 
-func marshal(val interface{}) (string, error)  {
+func marshal(val interface{}) (string, error) {
 	data, err := json.Marshal(val)
 	if err != nil {
 		return "", err

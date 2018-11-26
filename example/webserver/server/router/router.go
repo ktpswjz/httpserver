@@ -1,25 +1,25 @@
 package router
 
 import (
-	"github.com/ktpswjz/httpserver/types"
-	"github.com/ktpswjz/httpserver/example/webserver/server/config"
-	"github.com/ktpswjz/httpserver/router"
-	"net/http"
-	"strings"
 	"github.com/ktpswjz/httpserver/document"
 	"github.com/ktpswjz/httpserver/example/webserver/database/memory"
+	"github.com/ktpswjz/httpserver/example/webserver/server/config"
 	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
+	"github.com/ktpswjz/httpserver/router"
+	"github.com/ktpswjz/httpserver/types"
+	"net/http"
+	"strings"
 	"time"
 )
 
 const (
-	App  = "/app"
-	Auth    = "/auth"
-	Doc  = "/doc"
-	DocApi  = "/doc.api"
-	Admin  = "/admin"
-	AdminApi  = "/api"
-	Favicon = "/admin/favicon.ico"
+	App      = "/app"
+	Auth     = "/auth"
+	Doc      = "/doc"
+	DocApi   = "/doc.api"
+	Admin    = "/admin"
+	AdminApi = "/api"
+	Favicon  = "/admin/favicon.ico"
 )
 
 type Router interface {
@@ -28,8 +28,8 @@ type Router interface {
 	PostRouting(a router.Assistant)
 }
 
-func NewRouter(cfg *config.Config, log types.Log) Router  {
-	instance := &innerRouter {cfg: cfg}
+func NewRouter(cfg *config.Config, log types.Log) Router {
+	instance := &innerRouter{cfg: cfg}
 	instance.SetLog(log)
 	instance.dbToken, _ = memory.NewToken(cfg.Site.Admin.Api.Token.Expiration, log)
 
@@ -38,7 +38,7 @@ func NewRouter(cfg *config.Config, log types.Log) Router  {
 
 type innerRouter struct {
 	types.Base
-	cfg *config.Config
+	cfg     *config.Config
 	dbToken memory.Token
 
 	// controllers
@@ -50,18 +50,18 @@ type innerRouter struct {
 func (s *innerRouter) Map(router *router.Router) {
 	router.Doc = document.NewDocument(s.cfg.Site.Doc.Enable, s.GetLog())
 
-	s.mapAuthApi(types.Path{Prefix:Auth}, router)
-	s.mapAppSite(types.Path{Prefix:App}, router, s.cfg.Site.App.Root)
+	s.mapAuthApi(types.Path{Prefix: Auth}, router)
+	s.mapAppSite(types.Path{Prefix: App}, router, s.cfg.Site.App.Root)
 
 	if s.cfg.Site.Admin.Enable {
-		s.mapAdminApi(types.Path{Prefix:AdminApi}, router)
-		s.mapAdminSite(types.Path{Prefix:Admin}, router, s.cfg.Site.Admin.Root)
+		s.mapAdminApi(types.Path{Prefix: AdminApi}, router)
+		s.mapAdminSite(types.Path{Prefix: Admin}, router, s.cfg.Site.Admin.Root)
 		s.LogInfo("admin is enabled")
 	}
 
 	if s.cfg.Site.Doc.Enable {
-		s.mapDocApi(types.Path{Prefix:DocApi}, router)
-		s.mapDocSite(types.Path{Prefix:Doc}, router, s.cfg.Site.Doc.Root)
+		s.mapDocApi(types.Path{Prefix: DocApi}, router)
+		s.mapDocSite(types.Path{Prefix: Doc}, router, s.cfg.Site.Doc.Root)
 		s.LogInfo("doc is enabled")
 		router.Doc.GenerateCatalogTree()
 	}
@@ -110,11 +110,10 @@ func (s *innerRouter) PostRouting(a router.Assistant) {
 
 }
 
-
-func isApi(path string) bool  {
+func isApi(path string) bool {
 	return strings.HasPrefix(path, Auth) || strings.HasPrefix(path, AdminApi)
 }
 
-func isAdminApi(path string) bool  {
+func isAdminApi(path string) bool {
 	return strings.HasPrefix(path, AdminApi)
 }

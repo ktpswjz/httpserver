@@ -1,11 +1,11 @@
 package document
 
 import (
-	"encoding/json"
 	"crypto/md5"
 	"encoding/hex"
-	"strings"
+	"encoding/json"
 	"github.com/ktpswjz/httpserver/types"
+	"strings"
 )
 
 type Document interface {
@@ -16,7 +16,7 @@ type Document interface {
 	GenerateCatalogTree()
 }
 
-func NewDocument(enable bool, log types.Log) Document  {
+func NewDocument(enable bool, log types.Log) Document {
 	instance := &innerDocument{enable: enable}
 	instance.functions = make(map[string]*ModelFunction)
 	instance.catalogs = make([]*ModelCatalog, 0)
@@ -28,13 +28,13 @@ func NewDocument(enable bool, log types.Log) Document  {
 
 type innerDocument struct {
 	types.Base
-	enable bool
-	functions map[string]*ModelFunction
-	catalogs []*ModelCatalog
+	enable      bool
+	functions   map[string]*ModelFunction
+	catalogs    []*ModelCatalog
 	catalogTree []*ModelCatalogTree
 }
 
-func (s *innerDocument) AddFunction(method, path string, handle Handle)  {
+func (s *innerDocument) AddFunction(method, path string, handle Handle) {
 	if !s.enable {
 		return
 	}
@@ -53,7 +53,7 @@ func (s *innerDocument) AddFunction(method, path string, handle Handle)  {
 	s.appendFunction(fun, method, path, assistant)
 }
 
-func (s *innerDocument) GetFunction(id string) *ModelFunction  {
+func (s *innerDocument) GetFunction(id string) *ModelFunction {
 	return s.functions[id]
 }
 
@@ -71,7 +71,7 @@ func (s *innerDocument) GenerateCatalogTree() {
 	cn := len(s.catalogs)
 	for ci := 0; ci < cn; ci++ {
 		c := s.catalogs[ci]
-		tc := &ModelCatalogTree{Name:c.Name, Note:c.Note, Type: 0}
+		tc := &ModelCatalogTree{Name: c.Name, Note: c.Note, Type: 0}
 		tc.Children = make([]*ModelCatalogTree, 0)
 		s.catalogTree = append(s.catalogTree, tc)
 
@@ -83,7 +83,7 @@ func (s *innerDocument) generateCatalogTree(tree *ModelCatalogTree, catalog *Mod
 	cn := len(catalog.Catalogs)
 	for ci := 0; ci < cn; ci++ {
 		c := catalog.Catalogs[ci]
-		tc := &ModelCatalogTree{Name:c.Name, Note:c.Note, Type: 0}
+		tc := &ModelCatalogTree{Name: c.Name, Note: c.Note, Type: 0}
 		tc.Children = make([]*ModelCatalogTree, 0)
 		tree.Children = append(tree.Children, tc)
 
@@ -93,7 +93,7 @@ func (s *innerDocument) generateCatalogTree(tree *ModelCatalogTree, catalog *Mod
 	fc := len(catalog.Functions)
 	for fi := 0; fi < fc; fi++ {
 		f := catalog.Functions[fi]
-		tf := &ModelCatalogTree{Name:f.Name, ID:f.ID, Type: 1}
+		tf := &ModelCatalogTree{Name: f.Name, ID: f.ID, Type: 1}
 		tfi := s.functions[f.ID]
 		if tfi != nil {
 			keywords := &strings.Builder{}
@@ -107,7 +107,7 @@ func (s *innerDocument) generateCatalogTree(tree *ModelCatalogTree, catalog *Mod
 	}
 }
 
-func (s *innerDocument) appendFunction(f Function, method, path string, assistant *innerAssistant)  {
+func (s *innerDocument) appendFunction(f Function, method, path string, assistant *innerAssistant) {
 	if f == nil {
 		return
 	}
@@ -121,19 +121,19 @@ func (s *innerDocument) appendFunction(f Function, method, path string, assistan
 	modelFunction.InputHeaders = make([]*ModelHeader, 0)
 	if !f.IsIgnoreToken() {
 		tokenHeader := &ModelHeader{
-			Name: "token",
-			Note: "凭证",
+			Name:     "token",
+			Note:     "凭证",
 			Required: true,
-			Values: make([]string, 0),
+			Values:   make([]string, 0),
 		}
 		modelFunction.InputHeaders = append(modelFunction.InputHeaders, tokenHeader)
 	}
 	if f.GetContentType() != "" {
 		contentTypeHeader := &ModelHeader{
-			Name: "Content-Type",
-			Note: "内容类型",
-			Required: true,
-			Values: make([]string, 0),
+			Name:         "Content-Type",
+			Note:         "内容类型",
+			Required:     true,
+			Values:       make([]string, 0),
 			DefaultValue: f.GetContentType(),
 		}
 		contentTypeHeader.Values = append(contentTypeHeader.Values, f.GetContentType())
@@ -151,11 +151,11 @@ func (s *innerDocument) appendFunction(f Function, method, path string, assistan
 
 	modelFunction.OutputHeaders = f.GetOutputHeader()
 	output := &types.Result{
-		Code: 0,
+		Code:   0,
 		Serial: 201805161315480008,
-		Error: types.ResultError {
+		Error: types.ResultError{
 			Summary: "",
-			Detail: "",
+			Detail:  "",
 		},
 		Data: f.GetOutputExample(),
 	}
@@ -212,13 +212,13 @@ func (s *innerDocument) appendCatalog(catalog *innerCatalog, functionId, functio
 
 	if currentModelCatalog != nil {
 		currentModelCatalog.Functions = append(currentModelCatalog.Functions, &ModelCatalogFunction{
-			ID: functionId,
+			ID:   functionId,
 			Name: functionName,
 		})
 	}
 }
 
-func (s *innerDocument) GetChildByName(name string) *ModelCatalog  {
+func (s *innerDocument) GetChildByName(name string) *ModelCatalog {
 	n := len(s.catalogs)
 	for i := 0; i < n; i++ {
 		if s.catalogs[i].Name == name {
@@ -226,11 +226,11 @@ func (s *innerDocument) GetChildByName(name string) *ModelCatalog  {
 		}
 	}
 
-	return  nil
+	return nil
 }
 
 func (s *innerDocument) AddChild(name, note string) *ModelCatalog {
-	catalog := &ModelCatalog{Name:name, Note:note}
+	catalog := &ModelCatalog{Name: name, Note: note}
 	catalog.Catalogs = make([]*ModelCatalog, 0)
 	catalog.Functions = make([]*ModelCatalogFunction, 0)
 
@@ -239,7 +239,7 @@ func (s *innerDocument) AddChild(name, note string) *ModelCatalog {
 	return catalog
 }
 
-func (s *innerDocument) jsonString(v interface{}) string  {
+func (s *innerDocument) jsonString(v interface{}) string {
 	if v == nil {
 		return ""
 	}
@@ -260,5 +260,3 @@ func (s *innerDocument) generateFunctionId(method, path string) string {
 
 	return hex.EncodeToString(hasher.Sum(nil))
 }
-
-

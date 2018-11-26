@@ -1,15 +1,15 @@
 package admin
 
 import (
-	"github.com/ktpswjz/httpserver/example/webserver/server/controller"
-	"github.com/ktpswjz/httpserver/example/webserver/server/config"
-	"github.com/ktpswjz/httpserver/types"
-	"github.com/ktpswjz/httpserver/example/webserver/database/memory"
-	"time"
-	"net/http"
-	"github.com/ktpswjz/httpserver/router"
-	"github.com/ktpswjz/httpserver/example/webserver/model"
 	"github.com/ktpswjz/httpserver/document"
+	"github.com/ktpswjz/httpserver/example/webserver/database/memory"
+	"github.com/ktpswjz/httpserver/example/webserver/model"
+	"github.com/ktpswjz/httpserver/example/webserver/server/config"
+	"github.com/ktpswjz/httpserver/example/webserver/server/controller"
+	"github.com/ktpswjz/httpserver/router"
+	"github.com/ktpswjz/httpserver/types"
+	"net/http"
+	"time"
 )
 
 type Service struct {
@@ -18,7 +18,7 @@ type Service struct {
 	bootTime time.Time
 }
 
-func NewService(cfg *config.Config, log types.Log, dbToken memory.Token) *Service  {
+func NewService(cfg *config.Config, log types.Log, dbToken memory.Token) *Service {
 	instance := &Service{}
 	instance.Config = cfg
 	instance.SetLog(log)
@@ -42,14 +42,14 @@ func (s *Service) GetInfo(w http.ResponseWriter, r *http.Request, p router.Param
 	a.Success(data)
 }
 
-func (s *Service) GetInfoDoc(a document.Assistant) document.Function  {
+func (s *Service) GetInfoDoc(a document.Assistant) document.Function {
 	function := a.CreateFunction("获取当前服务信息")
 	function.SetNote("获取当前服务信息")
 	function.SetOutputExample(&model.ServiceInfo{
-		Name: "server",
+		Name:     "server",
 		BootTime: types.Time(time.Now()),
-		Version: "1.0.1.0",
-		Remark: "XXX服务",
+		Version:  "1.0.1.0",
+		Remark:   "XXX服务",
 	})
 	function.SetContentType("")
 
@@ -58,4 +58,3 @@ func (s *Service) GetInfoDoc(a document.Assistant) document.Function  {
 
 	return function
 }
-

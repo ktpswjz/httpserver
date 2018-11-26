@@ -1,21 +1,21 @@
 package disk
 
 import (
-	"github.com/shirou/gopsutil/disk"
 	"fmt"
+	"github.com/shirou/gopsutil/disk"
 )
 
 type Partition struct {
-	FileSystem	 	string	`json:"fileSystem" note:"文件系统, 如/dev/sda1"`
-	FileSystemType 	string	`json:"fileSystemType" note:"文件系统类型, 如NTFS"`
-	Path			string	`json:"path" note:"路径(挂载点), 如/sys"`
-	Total           string  `json:"total" note:"总容量"`
-	Free            string  `json:"free" note:"剩余容量"`
-	Used            string  `json:"used" note:"已用容量"`
-	UsedPercent     float64 `json:"usedPercent" note:"已用比分比"`
+	FileSystem     string  `json:"fileSystem" note:"文件系统, 如/dev/sda1"`
+	FileSystemType string  `json:"fileSystemType" note:"文件系统类型, 如NTFS"`
+	Path           string  `json:"path" note:"路径(挂载点), 如/sys"`
+	Total          string  `json:"total" note:"总容量"`
+	Free           string  `json:"free" note:"剩余容量"`
+	Used           string  `json:"used" note:"已用容量"`
+	UsedPercent    float64 `json:"usedPercent" note:"已用比分比"`
 }
 
-func Partitions() ([]Partition, error)  {
+func Partitions() ([]Partition, error) {
 	ps, err := disk.Partitions(false)
 	if err != nil {
 		return nil, err
@@ -39,23 +39,20 @@ func Partitions() ([]Partition, error)  {
 		infos = append(infos, info)
 	}
 
-
-
 	return infos, nil
 }
 
-
-func diskToText(v float64) string  {
+func diskToText(v float64) string {
 	kb := float64(1024)
 	mb := 1024 * kb
 	gb := 1024 * mb
 
 	if v >= gb {
-		return fmt.Sprintf("%.1fGB", v / gb)
+		return fmt.Sprintf("%.1fGB", v/gb)
 	} else if v >= mb {
-		return fmt.Sprintf("%.1fMB", v / mb)
+		return fmt.Sprintf("%.1fMB", v/mb)
 	} else if v >= kb {
-		return fmt.Sprintf("%.1fKB", v / kb)
+		return fmt.Sprintf("%.1fKB", v/kb)
 	} else {
 		return fmt.Sprintf("%.0fB", v)
 	}

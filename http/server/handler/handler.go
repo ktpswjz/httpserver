@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/ktpswjz/httpserver/id"
 	"github.com/ktpswjz/httpserver/router"
 	"github.com/ktpswjz/httpserver/security/rsakey"
@@ -16,7 +17,7 @@ type Handler interface {
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
-func NewHandler(handle Handle, log types.Log, restart func() error) (Handler, error) {
+func NewHandler(handle Handle, log types.Log, redirectToHttps bool, restart func() error) (Handler, error) {
 	privateKey := &rsakey.Private{}
 	err := privateKey.Create(1024)
 	if err != nil {
@@ -29,6 +30,7 @@ func NewHandler(handle Handle, log types.Log, restart func() error) (Handler, er
 	instance.sqlEntityId = id.NewTime()
 	instance.randKey = privateKey
 	instance.restart = restart
+	instance.redirectToHttps = redirectToHttps
 
 	if handle != nil {
 		handle.Map(instance.router)
@@ -39,12 +41,13 @@ func NewHandler(handle Handle, log types.Log, restart func() error) (Handler, er
 
 type innerHandler struct {
 	types.Base
-	router      *router.Router
-	handle      Handle
-	requestId   id.Generator
-	sqlEntityId id.Generator
-	randKey     *rsakey.Private
-	restart     func() error
+	router          *router.Router
+	handle          Handle
+	requestId       id.Generator
+	sqlEntityId     id.Generator
+	randKey         *rsakey.Private
+	restart         func() error
+	redirectToHttps bool
 }
 
 func (s *innerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -56,6 +59,14 @@ func (s *innerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		", schema=", a.schema,
 		", method=", r.Method,
 		", path=", a.path)
+
+	if a.schema == "http" {
+		if s.redirectToHttps {
+			redirectUrl := fmt.Sprintf("https://%s%s", r.Host, a.path)
+			http.Redirect(w, r, redirectUrl, http.StatusMovedPermanently)
+			return
+		}
+	}
 
 	defer func(a *Assistant) {
 		s.postRouting(a)

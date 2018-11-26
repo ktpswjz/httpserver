@@ -1,21 +1,21 @@
 package admin
 
 import (
-	"github.com/ktpswjz/httpserver/example/webserver/server/controller"
-	"net/http"
-	"github.com/ktpswjz/httpserver/router"
 	"github.com/ktpswjz/httpserver/document"
-	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
-	"github.com/ktpswjz/httpserver/example/webserver/server/config"
-	"github.com/ktpswjz/httpserver/types"
 	"github.com/ktpswjz/httpserver/example/webserver/database/memory"
+	"github.com/ktpswjz/httpserver/example/webserver/server/config"
+	"github.com/ktpswjz/httpserver/example/webserver/server/controller"
+	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
+	"github.com/ktpswjz/httpserver/router"
+	"github.com/ktpswjz/httpserver/types"
+	"net/http"
 )
 
 type Logout struct {
 	controller.Base
 }
 
-func NewLogout(cfg *config.Config, log types.Log, dbToken memory.Token) *Logout  {
+func NewLogout(cfg *config.Config, log types.Log, dbToken memory.Token) *Logout {
 	instance := &Logout{}
 	instance.Config = cfg
 	instance.SetLog(log)
@@ -27,23 +27,23 @@ func NewLogout(cfg *config.Config, log types.Log, dbToken memory.Token) *Logout 
 func (s *Logout) Logout(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant) {
 	token, err := s.DbToken.Get(a.Token())
 	if err != nil {
-		a.Error(errors.Exception,  err)
+		a.Error(errors.Exception, err)
 		return
 	}
 	if token == nil {
-		a.Error(errors.NotExist,  "凭证'", a.Token(), "'不存在")
+		a.Error(errors.NotExist, "凭证'", a.Token(), "'不存在")
 		return
 	}
 	err = s.DbToken.Del(token)
 	if err != nil {
-		a.Error(errors.Exception,  err)
+		a.Error(errors.Exception, err)
 		return
 	}
 
 	a.Success(true)
 }
 
-func (s *Logout) LogoutDoc(a document.Assistant) document.Function  {
+func (s *Logout) LogoutDoc(a document.Assistant) document.Function {
 	function := a.CreateFunction("退出登录")
 	function.SetNote("退出登录, 使当前凭证失效")
 	function.SetOutputExample(true)

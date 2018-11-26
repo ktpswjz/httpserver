@@ -1,6 +1,5 @@
 package router
 
-
 // CleanPath is the URL version of path.Clean, it returns a canonical URL path
 // for p, eliminating . and .. elements.
 //

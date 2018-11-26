@@ -8,7 +8,7 @@ type Catalog interface {
 type innerCatalog struct {
 	function Function
 	catalogs []*innerCatalog
-	parent *innerCatalog
+	parent   *innerCatalog
 
 	name string
 	note string

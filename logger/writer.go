@@ -1,12 +1,12 @@
 package logger
 
 import (
+	"fmt"
 	"log"
 	"os"
-	"time"
-	"sync"
-	"fmt"
 	"path/filepath"
+	"sync"
+	"time"
 )
 
 var std = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)

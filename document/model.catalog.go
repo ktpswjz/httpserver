@@ -6,14 +6,14 @@ type ModelCatalogContainer interface {
 }
 
 type ModelCatalog struct {
-	Name string `json:"name"`	// 接口名称
-	Note string `json:"note"`	// 接口说明
+	Name string `json:"name"` // 接口名称
+	Note string `json:"note"` // 接口说明
 
-	Catalogs []*ModelCatalog 			`json:"catalogs"`
-	Functions []*ModelCatalogFunction 	`json:"functions"`
+	Catalogs  []*ModelCatalog         `json:"catalogs"`
+	Functions []*ModelCatalogFunction `json:"functions"`
 }
 
-func (s *ModelCatalog) GetChildByName(name string) *ModelCatalog  {
+func (s *ModelCatalog) GetChildByName(name string) *ModelCatalog {
 	n := len(s.Catalogs)
 	for i := 0; i < n; i++ {
 		if s.Catalogs[i].Name == name {
@@ -21,11 +21,11 @@ func (s *ModelCatalog) GetChildByName(name string) *ModelCatalog  {
 		}
 	}
 
-	return  nil
+	return nil
 }
 
 func (s *ModelCatalog) AddChild(name, note string) *ModelCatalog {
-	catalog := &ModelCatalog{Name:name, Note:note}
+	catalog := &ModelCatalog{Name: name, Note: note}
 	catalog.Catalogs = make([]*ModelCatalog, 0)
 	catalog.Functions = make([]*ModelCatalogFunction, 0)
 

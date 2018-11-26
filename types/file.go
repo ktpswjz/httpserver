@@ -1,8 +1,8 @@
 package types
 
 import (
-	"os"
 	"io"
+	"os"
 )
 
 type File struct {

@@ -1,27 +1,26 @@
 package config
 
 import (
-	"github.com/ktpswjz/httpserver/types"
-	"github.com/ktpswjz/httpserver/http/server/configure"
-	"io/ioutil"
 	"encoding/json"
-	"sync"
-	"os"
 	"fmt"
+	"github.com/ktpswjz/httpserver/http/server/configure"
+	"github.com/ktpswjz/httpserver/types"
+	"io/ioutil"
+	"os"
+	"sync"
 )
 
 type Config struct {
-	mutex 	sync.RWMutex
-	args 	*types.Args
+	mutex sync.RWMutex
+	args  *types.Args
 
-	Name 	string 					`json:"name"`
-	Log 	Log 					`json:"log"`
-	Server 	configure.Server		`json:"server"`
-	Site 	Site 					`json:"site"`
+	Name   string           `json:"name"`
+	Log    Log              `json:"log"`
+	Server configure.Server `json:"server"`
+	Site   Site             `json:"site"`
 }
 
-
-func NewConfig() *Config  {
+func NewConfig() *Config {
 	return &Config{
 		Name: "HTTP服务器",
 		Log: Log{
@@ -39,11 +38,10 @@ func NewConfig() *Config  {
 				Address: "",
 				Port:    "8443",
 				Cert: configure.Certificate{
-					File: "",
+					File:     "",
 					Password: "",
 				},
 			},
-
 		},
 		Site: Site{
 			App: SiteApp{
@@ -51,42 +49,42 @@ func NewConfig() *Config  {
 			},
 			Doc: SiteDoc{
 				Enable: true,
-				Root: "/home/dev/project/vue/httpserver/doc/dist",
+				Root:   "/home/dev/project/vue/httpserver/doc/dist",
 			},
 			Admin: SiteAdmin{
 				Enable: true,
-				Root: "/home/dev/project/vue/httpserver/admin/dist",
+				Root:   "/home/dev/project/vue/httpserver/admin/dist",
 				Api: SiteAdminApi{
 					Token: Token{
 						Expiration: 30,
 					},
 				},
-				Users: []SiteAdminUser {
+				Users: []SiteAdminUser{
 					{
-						Account: "admin",
+						Account:  "admin",
 						Password: "1",
 					},
 				},
-				Ldap: SiteAdminLdap {
+				Ldap: SiteAdminLdap{
 					Enable: true,
-					Host: "192.168.123.1",
-					Port: 389,
-					Base: "dc=csby,dc=studio",
+					Host:   "192.168.123.1",
+					Port:   389,
+					Base:   "dc=csby,dc=studio",
 				},
 			},
 		},
 	}
 }
 
-func (s *Config) SetArgs(args *types.Args)  {
+func (s *Config) SetArgs(args *types.Args) {
 	s.args = args
 }
 
-func (s *Config) GetArgs() *types.Args  {
+func (s *Config) GetArgs() *types.Args {
 	return s.args
 }
 
-func (s *Config) GetServer() *configure.Server  {
+func (s *Config) GetServer() *configure.Server {
 	return &s.Server
 }
 

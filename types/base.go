@@ -4,11 +4,11 @@ type Base struct {
 	log Log
 }
 
-func (s *Base) SetLog(log Log)  {
+func (s *Base) SetLog(log Log) {
 	s.log = log
 }
 
-func (s *Base) GetLog() Log  {
+func (s *Base) GetLog() Log {
 	return s.log
 }
 

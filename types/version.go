@@ -2,16 +2,16 @@ package types
 
 import (
 	"fmt"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 // 版本号
 type Version struct {
-	Major    int	`json:"major"`
-	Minor    int	`json:"minor"`
-	Build    int	`json:"build"`
-	Revision int	`json:"revision"`
+	Major    int `json:"major"`
+	Minor    int `json:"minor"`
+	Build    int `json:"build"`
+	Revision int `json:"revision"`
 }
 
 // 解析版本号

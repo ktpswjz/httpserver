@@ -1,22 +1,22 @@
 package model
 
 import (
-	"github.com/ktpswjz/httpserver/types"
-	"sync"
-	"io/ioutil"
 	"encoding/json"
-	"os"
 	"fmt"
+	"github.com/ktpswjz/httpserver/types"
+	"io/ioutil"
+	"os"
 	"path/filepath"
+	"sync"
 )
 
 type App struct {
-	mutex 	sync.RWMutex
+	mutex sync.RWMutex
 
-	Version		string		`json:"version" note:"版本号"`
-	UploadTime 	types.Time	`json:"uploadTime" note:"上传时间"`
-	UploadUser	string		`json:"uploadUser" note:"上传者账号"`
-	Remark		string		`json:"remark" note:"说明"`
+	Version    string     `json:"version" note:"版本号"`
+	UploadTime types.Time `json:"uploadTime" note:"上传时间"`
+	UploadUser string     `json:"uploadUser" note:"上传者账号"`
+	Remark     string     `json:"remark" note:"说明"`
 }
 
 func (s *App) LoadFromFile(filePath string) error {
@@ -52,25 +52,25 @@ func (s *App) SaveToFile(filePath string) error {
 }
 
 type AppFilter struct {
-	Path		string		`json:"path" note:"应用程序路径"`
+	Path string `json:"path" note:"应用程序路径"`
 }
 
 type AppTree struct {
-	parent		*AppTree
+	parent *AppTree
 
-	Type		int			`json:"type" note:"0-folder; 1-app"`
-	Name		string		`json:"name" note:"应用程序名称"`
-	Path		string		`json:"path" note:"应用程序路径"`
-	Url			string		`json:"url" note:"访问地址"`
-	Version		string		`json:"version" note:"版本号"`
-	UploadTime 	types.Time	`json:"uploadTime" note:"上传时间"`
-	UploadUser	string		`json:"uploadUser" note:"上传者账号"`
-	Remark		string		`json:"remark" note:"说明"`
+	Type       int        `json:"type" note:"0-folder; 1-app"`
+	Name       string     `json:"name" note:"应用程序名称"`
+	Path       string     `json:"path" note:"应用程序路径"`
+	Url        string     `json:"url" note:"访问地址"`
+	Version    string     `json:"version" note:"版本号"`
+	UploadTime types.Time `json:"uploadTime" note:"上传时间"`
+	UploadUser string     `json:"uploadUser" note:"上传者账号"`
+	Remark     string     `json:"remark" note:"说明"`
 
-	Children	[]*AppTree	`json:"children"`
+	Children []*AppTree `json:"children"`
 }
 
-func (s *AppTree) ParseChildren(folderPath, baseUrl string)  {
+func (s *AppTree) ParseChildren(folderPath, baseUrl string) {
 	s.Children = make([]*AppTree, 0)
 
 	paths, err := ioutil.ReadDir(folderPath)
@@ -80,18 +80,18 @@ func (s *AppTree) ParseChildren(folderPath, baseUrl string)  {
 				continue
 			}
 
-			child := &AppTree {
-				Name: path.Name(),
-				parent: s,
-				Type: 0,
+			child := &AppTree{
+				Name:       path.Name(),
+				parent:     s,
+				Type:       0,
 				UploadTime: types.Time(path.ModTime()),
 			}
 			child.Path = child.getPath()
 			s.Children = append(s.Children, child)
 
-			appInfo  := filepath.Join(folderPath, path.Name(), "app.info")
-			app := &App {
-				Version: "1.0.1.0",
+			appInfo := filepath.Join(folderPath, path.Name(), "app.info")
+			app := &App{
+				Version:    "1.0.1.0",
 				UploadTime: types.Time(path.ModTime()),
 			}
 			err = app.LoadFromFile(appInfo)
@@ -109,7 +109,7 @@ func (s *AppTree) ParseChildren(folderPath, baseUrl string)  {
 	}
 }
 
-func (s *AppTree) getPath() string  {
+func (s *AppTree) getPath() string {
 	path := s.Name
 
 	parent := s.parent

@@ -2,15 +2,15 @@ package router
 
 import (
 	"github.com/ktpswjz/httpserver/example/webserver/server/controller/admin"
-	"github.com/ktpswjz/httpserver/types"
 	"github.com/ktpswjz/httpserver/router"
+	"github.com/ktpswjz/httpserver/types"
 )
 
 type adminController struct {
-	adminConfig *admin.Config
-	adminSys *admin.Sys
-	adminLogout *admin.Logout
-	adminApp *admin.App
+	adminConfig  *admin.Config
+	adminSys     *admin.Sys
+	adminLogout  *admin.Logout
+	adminApp     *admin.App
 	adminService *admin.Service
 }
 

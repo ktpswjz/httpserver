@@ -1,8 +1,8 @@
 package router
 
 import (
-	"net/http"
 	"github.com/ktpswjz/httpserver/document"
+	"net/http"
 )
 
 // Handle is a function that can be registered to a route to handle HTTP
@@ -73,7 +73,7 @@ type Router struct {
 
 	// Configurable http.Handler which is called when no matching route is
 	// found. If it is not set, http.NotFound is used.
-	NotFound http.Handler
+	NotFound  http.Handler
 	NotFound2 Handler
 
 	// Configurable http.Handler which is called when a request

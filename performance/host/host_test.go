@@ -2,7 +2,7 @@ package host
 
 import "testing"
 
-func TestInfo(t *testing.T)  {
+func TestInfo(t *testing.T) {
 	v, err := Info()
 	if err != nil {
 		t.Fatal(err)

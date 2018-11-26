@@ -1,38 +1,38 @@
 package auth
 
 import (
-	"net/http"
-	"github.com/ktpswjz/httpserver/router"
 	"github.com/ktpswjz/httpserver/document"
 	"github.com/ktpswjz/httpserver/example/webserver/model"
 	"github.com/ktpswjz/httpserver/example/webserver/server/controller"
+	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
+	"github.com/ktpswjz/httpserver/router"
+	"github.com/mojocn/base64Captcha"
+	"net/http"
 	"strings"
 	"time"
-	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
-	"github.com/mojocn/base64Captcha"
 )
 
 type Admin struct {
 	controller.Base
 
-	Authenticate 	func(account, password string) error
-	ErrorCount		map[string]int
+	Authenticate func(account, password string) error
+	ErrorCount   map[string]int
 }
 
-func (s *Admin) GetInfo(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant)  {
-	data := &model.SysInfo {
-		Name: s.Config.Name,
+func (s *Admin) GetInfo(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant) {
+	data := &model.SysInfo{
+		Name:        s.Config.Name,
 		BackVersion: s.Config.GetArgs().ModuleVersion().ToString(),
 	}
 	a.Success(data)
 }
 
-func (s *Admin) GetInfoDoc(a document.Assistant) document.Function  {
+func (s *Admin) GetInfoDoc(a document.Assistant) document.Function {
 	function := a.CreateFunction("获取系统信息")
 	function.SetNote("获取服务系统当前相关信息")
-	function.SetOutputExample(&model.SysInfo {
-		Name: "WEB服务器",
-		BackVersion: "1.0.1.0",
+	function.SetOutputExample(&model.SysInfo{
+		Name:         "WEB服务器",
+		BackVersion:  "1.0.1.0",
 		FrontVersion: "1.0.1.8",
 	})
 	function.IgnoreToken(true)
@@ -44,24 +44,24 @@ func (s *Admin) GetInfoDoc(a document.Assistant) document.Function  {
 	return function
 }
 
-func (s *Admin) GetCaptcha(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant)  {
+func (s *Admin) GetCaptcha(w http.ResponseWriter, r *http.Request, p router.Params, a router.Assistant) {
 	filter := &model.CaptchaFilter{
-		Mode: base64Captcha.CaptchaModeNumberAlphabet,
+		Mode:   base64Captcha.CaptchaModeNumberAlphabet,
 		Length: 4,
-		Width: 100,
+		Width:  100,
 		Height: 30,
 	}
 	err := a.GetArgument(r, filter)
 	if err != nil {
-		a.Error(errors.InputError,  err)
+		a.Error(errors.InputError, err)
 		return
 	}
 
 	captchaConfig := base64Captcha.ConfigCharacter{
-		Mode: filter.Mode,
-		Height: filter.Height,
-		Width:  filter.Width,
-		CaptchaLen: filter.Length,
+		Mode:               filter.Mode,
+		Height:             filter.Height,
+		Width:              filter.Width,
+		CaptchaLen:         filter.Length,
 		ComplexOfNoiseText: base64Captcha.CaptchaComplexLower,
 		ComplexOfNoiseDot:  base64Captcha.CaptchaComplexLower,
 		IsShowHollowLine:   false,
@@ -73,8 +73,8 @@ func (s *Admin) GetCaptcha(w http.ResponseWriter, r *http.Request, p router.Para
 	captchaId, captchaValue := base64Captcha.GenerateCaptcha("", captchaConfig)
 
 	data := &model.Captcha{
-		ID: captchaId,
-		Value: base64Captcha.CaptchaWriteToBase64Encoding(captchaValue),
+		ID:       captchaId,
+		Value:    base64Captcha.CaptchaWriteToBase64Encoding(captchaValue),
 		Required: s.captchaRequired(a.RIP()),
 	}
 	randKey := a.RandKey()
@@ -91,18 +91,18 @@ func (s *Admin) GetCaptcha(w http.ResponseWriter, r *http.Request, p router.Para
 	a.Success(data)
 }
 
-func (s *Admin) GetCaptchaDoc(a document.Assistant) document.Function  {
+func (s *Admin) GetCaptchaDoc(a document.Assistant) document.Function {
 	function := a.CreateFunction("获取验证码")
 	function.SetNote("获取用户登陆需要的验证码信息")
 	function.SetInputExample(&model.CaptchaFilter{
-		Mode: base64Captcha.CaptchaModeNumberAlphabet,
+		Mode:   base64Captcha.CaptchaModeNumberAlphabet,
 		Length: 4,
-		Width: 100,
+		Width:  100,
 		Height: 30,
 	})
 	function.SetOutputExample(&model.Captcha{
-		ID: "GKSVhVMRAHsyVuXSrMYs",
-		Value: "data:image/png;base64,iVBOR...",
+		ID:     "GKSVhVMRAHsyVuXSrMYs",
+		Value:  "data:image/png;base64,iVBOR...",
 		RsaKey: "-----BEGIN PUBLIC KEY-----...-----END PUBLIC KEY-----",
 	})
 	function.IgnoreToken(true)
@@ -117,14 +117,14 @@ func (s *Admin) Login(w http.ResponseWriter, r *http.Request, p router.Params, a
 	filter := &model.LoginFilter{}
 	err := a.GetArgument(r, filter)
 	if err != nil {
-		a.Error(errors.InputError,  err)
+		a.Error(errors.InputError, err)
 		return
 	}
 
 	requireCaptcha := s.captchaRequired(a.RIP())
 	err = filter.Check(requireCaptcha)
 	if err != nil {
-		a.Error(errors.InputInvalid,  err)
+		a.Error(errors.InputInvalid, err)
 		return
 	}
 
@@ -160,20 +160,20 @@ func (s *Admin) Login(w http.ResponseWriter, r *http.Request, p router.Params, a
 
 	now := time.Now()
 	token := &model.Token{
-		ID: a.GenerateGuid(),
+		ID:          a.GenerateGuid(),
 		UserAccount: filter.Account,
-		LoginIP: a.RIP(),
-		LoginTime: now,
-		ActiveTime: now,
+		LoginIP:     a.RIP(),
+		LoginTime:   now,
+		ActiveTime:  now,
 	}
 	err = s.DbToken.Set(token)
 	if err != nil {
-		a.Error(errors.Exception,  err)
+		a.Error(errors.Exception, err)
 		return
 	}
 
-	login := &model.Login {
-		Token: token.ID,
+	login := &model.Login{
+		Token:   token.ID,
 		Account: token.UserAccount,
 	}
 
@@ -181,15 +181,15 @@ func (s *Admin) Login(w http.ResponseWriter, r *http.Request, p router.Params, a
 	s.clearErrorCount(a.RIP())
 }
 
-func (s *Admin) LoginDoc(a document.Assistant) document.Function  {
+func (s *Admin) LoginDoc(a document.Assistant) document.Function {
 	function := a.CreateFunction("用户登录")
 	function.SetNote("通过用户账号及密码进行登录获取凭证")
 	function.SetInputExample(&model.LoginFilter{
-		Account: "admin",
-		Password: "1",
-		CaptchaId: "r4kcmz2E12e0qJQOvqRB",
+		Account:      "admin",
+		Password:     "1",
+		CaptchaId:    "r4kcmz2E12e0qJQOvqRB",
 		CaptchaValue: "1e35",
-		Encryption: "",
+		Encryption:   "",
 	})
 	function.SetOutputExample(&model.Login{
 		Token: "71b9b7e2ac6d4166b18f414942ff3481",

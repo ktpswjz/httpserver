@@ -1,11 +1,11 @@
 package types
 
 import (
-	"strings"
-	"path/filepath"
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 )
 
 type ArgsParser interface {
@@ -14,19 +14,19 @@ type ArgsParser interface {
 
 type Args struct {
 	moduleVersion Version
-	moduleType string
-	moduleName string
-	moduleRemark string
-	modulePath string
+	moduleType    string
+	moduleName    string
+	moduleRemark  string
+	modulePath    string
 }
 
-func (s *Args) Parse(args []string, moduleType, moduleName, moduleVersion, moduleRemark string, parser ArgsParser)  {
+func (s *Args) Parse(args []string, moduleType, moduleName, moduleVersion, moduleRemark string, parser ArgsParser) {
 	s.moduleType = moduleType
 	s.moduleName = moduleName
 	s.moduleRemark = moduleRemark
 	s.moduleVersion.Parse(moduleVersion)
 
-	if(nil == args) {
+	if nil == args {
 		return
 	}
 	argsLength := len(args)
@@ -43,7 +43,7 @@ func (s *Args) Parse(args []string, moduleType, moduleName, moduleVersion, modul
 	for argsIndex := 1; argsIndex < argsLength; argsIndex++ {
 		arg := args[argsIndex]
 		splitIndex := strings.Index(arg, "=")
-		if(splitIndex < 1) {
+		if splitIndex < 1 {
 			if strings.ToLower("--type") == strings.ToLower(arg) { // 获取模块类型
 				fmt.Fprint(os.Stdout, moduleType)
 				os.Exit(0)
@@ -77,31 +77,31 @@ func (s *Args) Parse(args []string, moduleType, moduleName, moduleVersion, modul
 	}
 }
 
-func (s *Args) ModulePath() string  {
+func (s *Args) ModulePath() string {
 	return s.modulePath
 }
 
-func (s *Args) ModuleFolder() string  {
+func (s *Args) ModuleFolder() string {
 	return filepath.Dir(s.modulePath)
 }
 
-func (s *Args) ModuleType() string  {
+func (s *Args) ModuleType() string {
 	return s.moduleType
 }
 
-func (s *Args) ModuleName() string  {
+func (s *Args) ModuleName() string {
 	return s.moduleName
 }
 
-func (s *Args) ModuleRemark() string  {
+func (s *Args) ModuleRemark() string {
 	return s.moduleRemark
 }
 
-func (s *Args) ModuleVersion() *Version  {
+func (s *Args) ModuleVersion() *Version {
 	return &s.moduleVersion
 }
 
-func (s *Args) ParseNew(path string) (*Args, error)  {
+func (s *Args) ParseNew(path string) (*Args, error) {
 	out, err := exec.Command(path, "--version").Output()
 	if err != nil {
 		return nil, err

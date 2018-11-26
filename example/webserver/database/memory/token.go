@@ -1,37 +1,37 @@
 package memory
 
 import (
-	"time"
 	"github.com/hashicorp/go-memdb"
-	"github.com/ktpswjz/httpserver/types"
 	"github.com/ktpswjz/httpserver/example/webserver/model"
+	"github.com/ktpswjz/httpserver/types"
+	"time"
 )
 
 type Token interface {
 	Set(entity *model.Token) error
 	Del(entity interface{}) error
 	Get(id string) (*model.Token, error)
-	List(userId uint64)([]model.Token, error)
+	List(userId uint64) ([]model.Token, error)
 }
 
-func NewToken(expirationMinutes int64, log types.Log) (Token, error)  {
+func NewToken(expirationMinutes int64, log types.Log) (Token, error) {
 	instance := &innerToken{}
 	tableName := instance.tableName()
 
 	// Create the DB schema
 	dbSchema := &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema {
+		Tables: map[string]*memdb.TableSchema{
 			tableName: &memdb.TableSchema{
 				Name: tableName,
-				Indexes: map[string]*memdb.IndexSchema {
+				Indexes: map[string]*memdb.IndexSchema{
 					"id": &memdb.IndexSchema{
-						Name: "id",
-						Unique: true,
+						Name:    "id",
+						Unique:  true,
 						Indexer: &memdb.StringFieldIndex{Field: "ID"},
 					},
 					"userId": &memdb.IndexSchema{
-						Name: "userId",
-						Unique: false,
+						Name:    "userId",
+						Unique:  false,
 						Indexer: &memdb.UintFieldIndex{Field: "UserID"},
 					},
 				},
@@ -60,11 +60,11 @@ func NewToken(expirationMinutes int64, log types.Log) (Token, error)  {
 type innerToken struct {
 	types.Base
 
-	db *memdb.MemDB
+	db         *memdb.MemDB
 	expiration time.Duration
 }
 
-func (s *innerToken) tableName() string  {
+func (s *innerToken) tableName() string {
 	return "token"
 }
 
@@ -78,7 +78,7 @@ func (s *innerToken) checkExpiration(interval time.Duration) {
 	}
 }
 
-func (s *innerToken) deleteExpiration()  {
+func (s *innerToken) deleteExpiration() {
 	txn := s.db.Txn(false)
 	defer txn.Abort()
 
@@ -91,7 +91,7 @@ func (s *innerToken) deleteExpiration()  {
 	expTime := time.Now().Add(-s.expiration)
 	entities := make([]*model.Token, 0)
 	row := raw.Next()
-	for row != nil  {
+	for row != nil {
 		entity := row.(*model.Token)
 		row = raw.Next()
 		if entity == nil {
@@ -127,7 +127,7 @@ func (s *innerToken) deleteExpiration()  {
 	txn.Commit()
 }
 
-func (s *innerToken) Set(entity *model.Token) error  {
+func (s *innerToken) Set(entity *model.Token) error {
 	txn := s.db.Txn(true)
 	err := txn.Insert(s.tableName(), entity)
 	if err != nil {
@@ -138,7 +138,7 @@ func (s *innerToken) Set(entity *model.Token) error  {
 	return nil
 }
 
-func (s *innerToken) Get(id string) (*model.Token, error)  {
+func (s *innerToken) Get(id string) (*model.Token, error) {
 	txn := s.db.Txn(false)
 	defer txn.Abort()
 
@@ -153,7 +153,7 @@ func (s *innerToken) Get(id string) (*model.Token, error)  {
 	return raw.(*model.Token), nil
 }
 
-func (s *innerToken) Del(entity interface{}) error  {
+func (s *innerToken) Del(entity interface{}) error {
 	txn := s.db.Txn(true)
 	err := txn.Delete(s.tableName(), entity)
 	if err != nil {
@@ -164,7 +164,7 @@ func (s *innerToken) Del(entity interface{}) error  {
 	return nil
 }
 
-func (s *innerToken) List(userId uint64)([]model.Token, error)  {
+func (s *innerToken) List(userId uint64) ([]model.Token, error) {
 	entities := make([]model.Token, 0)
 	txn := s.db.Txn(false)
 	defer txn.Abort()
@@ -175,7 +175,7 @@ func (s *innerToken) List(userId uint64)([]model.Token, error)  {
 	}
 
 	row := raw.Next()
-	for row != nil  {
+	for row != nil {
 		entity := row.(*model.Token)
 		row = raw.Next()
 		if entity == nil {

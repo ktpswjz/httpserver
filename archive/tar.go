@@ -1,12 +1,12 @@
 package archive
 
 import (
+	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"archive/tar"
 	"io"
-	"path/filepath"
 	"os"
+	"path/filepath"
 )
 
 type Tar struct {

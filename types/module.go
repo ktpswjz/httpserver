@@ -2,7 +2,7 @@ package types
 
 import "os/exec"
 
-type  Module struct {
+type Module struct {
 	Path string
 }
 
@@ -21,7 +21,6 @@ func (s *Module) Version() string {
 func (s *Module) Remark() string {
 	return s.args("--remark")
 }
-
 
 func (s *Module) args(name string) string {
 	var value = ""

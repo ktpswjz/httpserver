@@ -1,6 +1,5 @@
 package types
 
-
 type Error interface {
 	Code() int
 	Summary() string
@@ -8,20 +7,20 @@ type Error interface {
 
 func NewError(code int, summary string) Error {
 	return &innerError{
-		code: code,
+		code:    code,
 		summary: summary,
 	}
 }
 
 type innerError struct {
-	code int
+	code    int
 	summary string
 }
 
-func (s *innerError ) Code() int {
+func (s *innerError) Code() int {
 	return s.code
 }
 
-func (s *innerError ) Summary() string {
+func (s *innerError) Summary() string {
 	return s.summary
 }

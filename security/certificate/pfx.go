@@ -1,15 +1,15 @@
 package certificate
 
 import (
+	"crypto/rsa"
 	"crypto/tls"
-	"io/ioutil"
-	"golang.org/x/crypto/pkcs12"
+	"crypto/x509"
+	"encoding/pem"
 	"errors"
 	"fmt"
-	"encoding/pem"
-	"crypto/x509"
 	"github.com/ktpswjz/httpserver/security/rsakey"
-	"crypto/rsa"
+	"golang.org/x/crypto/pkcs12"
+	"io/ioutil"
 )
 
 type Pfx struct {

@@ -1,28 +1,28 @@
 package main
 
 import (
-	"strings"
 	"fmt"
+	"strings"
 )
 
 type Args struct {
-	config string
-	help bool
+	config     string
+	help       bool
 	showConfig bool
 
 	// service
-	isInstall bool
+	isInstall   bool
 	isUninstall bool
-	isStart bool
-	isStop bool
-	isRestart bool
+	isStart     bool
+	isStop      bool
+	isRestart   bool
 }
 
-func (s *Args) Parse(key, value string)  {
+func (s *Args) Parse(key, value string) {
 	if key == strings.ToLower("-config") {
 		s.config = value
-	} else if key == strings.ToLower("-h") 	||
-		key == strings.ToLower("-help") 		||
+	} else if key == strings.ToLower("-h") ||
+		key == strings.ToLower("-help") ||
 		key == strings.ToLower("--help") {
 		s.help = true
 	} else if key == strings.ToLower("-showConfig") {
@@ -40,7 +40,7 @@ func (s *Args) Parse(key, value string)  {
 	}
 }
 
-func (s *Args) ShowHelp()  {
+func (s *Args) ShowHelp() {
 	fmt.Println(" -help:		", "show the usage")
 	fmt.Println(" -config:	", "set the config file path, default is 'config.json'")
 	fmt.Println(" -showConfig:	", "show current configure")

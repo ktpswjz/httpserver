@@ -1,28 +1,28 @@
 package admin
 
 import (
-	"github.com/ktpswjz/httpserver/example/webserver/server/controller"
-	"net/http"
-	"github.com/ktpswjz/httpserver/router"
-	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
 	"bytes"
-	"path/filepath"
-	"os"
 	"fmt"
 	"github.com/ktpswjz/httpserver/archive"
-	"github.com/ktpswjz/httpserver/example/webserver/model"
-	"github.com/ktpswjz/httpserver/types"
-	"time"
 	"github.com/ktpswjz/httpserver/document"
-	"github.com/ktpswjz/httpserver/example/webserver/server/config"
 	"github.com/ktpswjz/httpserver/example/webserver/database/memory"
+	"github.com/ktpswjz/httpserver/example/webserver/model"
+	"github.com/ktpswjz/httpserver/example/webserver/server/config"
+	"github.com/ktpswjz/httpserver/example/webserver/server/controller"
+	"github.com/ktpswjz/httpserver/example/webserver/server/errors"
+	"github.com/ktpswjz/httpserver/router"
+	"github.com/ktpswjz/httpserver/types"
+	"net/http"
+	"os"
+	"path/filepath"
+	"time"
 )
 
 type App struct {
 	controller.Base
 }
 
-func NewApp(cfg *config.Config, log types.Log, dbToken memory.Token) *App  {
+func NewApp(cfg *config.Config, log types.Log, dbToken memory.Token) *App {
 	instance := &App{}
 	instance.Config = cfg
 	instance.SetLog(log)
@@ -95,7 +95,7 @@ func (s *App) Upload(w http.ResponseWriter, r *http.Request, p router.Params, a 
 	if err == nil && token != nil {
 		appInfo.UploadUser = token.UserAccount
 	}
-	appInfoName  := filepath.Join(appFolder, "app.info")
+	appInfoName := filepath.Join(appFolder, "app.info")
 	appInfo.SaveToFile(appInfoName)
 
 	a.Success(appPath)
@@ -109,10 +109,10 @@ func (s *App) Tree(w http.ResponseWriter, r *http.Request, p router.Params, a ro
 	a.Success(appTree.Children)
 }
 
-func (s *App) TreeDoc(a document.Assistant) document.Function  {
+func (s *App) TreeDoc(a document.Assistant) document.Function {
 	function := a.CreateFunction("获取应用程序列表")
 	function.SetNote("获取服务系统当前所有应用程序")
-	function.SetOutputExample( []model.AppTree {
+	function.SetOutputExample([]model.AppTree{
 		{
 			Path:       "test",
 			UploadTime: types.Time(time.Now()),
@@ -133,34 +133,34 @@ func (s *App) Delete(w http.ResponseWriter, r *http.Request, p router.Params, a 
 	filter := &model.AppFilter{}
 	err := a.GetArgument(r, filter)
 	if err != nil {
-		a.Error(errors.InputError,  err)
+		a.Error(errors.InputError, err)
 		return
 	}
 	if filter.Path == "" {
-		a.Error(errors.InputError,  "应用程序路径为空")
+		a.Error(errors.InputError, "应用程序路径为空")
 		return
 	}
 
 	appPath := filepath.Join(s.Config.Site.App.Root, filter.Path)
 	info, err := os.Stat(appPath)
 	if os.IsNotExist(err) {
-		a.Error(errors.InputError,  fmt.Sprintf("应用程序'%s'不存在", filter.Path))
+		a.Error(errors.InputError, fmt.Sprintf("应用程序'%s'不存在", filter.Path))
 		return
 	}
 	if !info.IsDir() {
-		a.Error(errors.InputError,  fmt.Sprintf("应用程序'%s'无效", filter.Path))
+		a.Error(errors.InputError, fmt.Sprintf("应用程序'%s'无效", filter.Path))
 		return
 	}
 	err = os.RemoveAll(appPath)
 	if err != nil {
-		a.Error(errors.Exception,  err)
+		a.Error(errors.Exception, err)
 		return
 	}
 
 	a.Success(filter.Path)
 }
 
-func (s *App) DeleteDoc(a document.Assistant) document.Function  {
+func (s *App) DeleteDoc(a document.Assistant) document.Function {
 	function := a.CreateFunction("删除应用程序")
 	function.SetNote("删除存在的应用程序")
 	function.SetInputExample(&model.AppFilter{

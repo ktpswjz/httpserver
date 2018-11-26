@@ -1,19 +1,18 @@
 package archive
 
 import (
-	"bytes"
-	"path/filepath"
-	"os"
-	"io"
 	"archive/zip"
-	"unicode/utf8"
-	"golang.org/x/text/transform"
+	"bytes"
 	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
+	"io"
+	"os"
+	"path/filepath"
+	"unicode/utf8"
 )
 
 type Zip struct {
 }
-
 
 // 解压文件
 // source：待解压文件路径

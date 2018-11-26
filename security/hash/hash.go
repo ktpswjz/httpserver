@@ -1,21 +1,21 @@
 package hash
 
 import (
-	"encoding/hex"
 	"crypto/md5"
-	"crypto/sha256"
-	"hash"
 	"crypto/sha1"
+	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/hex"
 	"errors"
+	"hash"
 )
 
 const (
-	MD5		= 11
-	SHA1	= 21
-	SHA256	= 22
-	SHA384	= 23
-	SHA512	= 24
+	MD5    = 11
+	SHA1   = 21
+	SHA256 = 22
+	SHA384 = 23
+	SHA512 = 24
 )
 
 // 将哈希值转换成字符串

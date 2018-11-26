@@ -1,15 +1,15 @@
 package authentication
 
 import (
-	"github.com/go-ldap/ldap"
 	"fmt"
+	"github.com/go-ldap/ldap"
 	"strings"
 )
 
 type Ldap struct {
-	Host 	string	`json:"host"`
-	Port	int		`json:"port"`
-	Base 	string	`json:"base"`
+	Host string `json:"host"`
+	Port int    `json:"port"`
+	Base string `json:"base"`
 }
 
 func (s *Ldap) Authenticate(account, password string) error {
@@ -28,12 +28,12 @@ func (s *Ldap) Authenticate(account, password string) error {
 	return nil
 }
 
-func (s *Ldap) getUserName(account string) (loginName, samAccountName string)  {
+func (s *Ldap) getUserName(account string) (loginName, samAccountName string) {
 	loginName = account
 	samAccountName = account
 
 	if index := strings.LastIndex(account, "\\"); index != -1 {
-		samAccountName = account[index + 1:]
+		samAccountName = account[index+1:]
 	} else if index := strings.Index(account, "@"); index != -1 {
 		samAccountName = account[:index]
 	} else {
@@ -50,7 +50,6 @@ func (s *Ldap) getDomain() string {
 	if s.Base == "" {
 		return ""
 	}
-
 
 	items := strings.Split(s.Base, ",")
 	itemCount := len(items)

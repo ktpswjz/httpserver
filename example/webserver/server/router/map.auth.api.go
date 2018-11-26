@@ -1,14 +1,14 @@
 package router
 
 import (
-	"github.com/ktpswjz/httpserver/types"
-	"github.com/ktpswjz/httpserver/router"
-	"github.com/ktpswjz/httpserver/example/webserver/server/controller/auth"
 	"github.com/ktpswjz/httpserver/example/webserver/server/authentication"
+	"github.com/ktpswjz/httpserver/example/webserver/server/controller/auth"
+	"github.com/ktpswjz/httpserver/router"
+	"github.com/ktpswjz/httpserver/types"
 )
 
 type authController struct {
-	authAdmin *auth.Admin
+	authAdmin           *auth.Admin
 	adminAuthentication authentication.Admin
 }
 

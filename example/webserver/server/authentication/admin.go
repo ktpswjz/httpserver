@@ -1,8 +1,8 @@
 package authentication
 
 import (
-	"github.com/ktpswjz/httpserver/example/webserver/server/config"
 	"errors"
+	"github.com/ktpswjz/httpserver/example/webserver/server/config"
 	"strings"
 )
 
@@ -17,7 +17,7 @@ func (s *Admin) Authenticate(account, password string) error {
 
 	var user *config.SiteAdminUser = nil
 	userCount := len(s.Config.Users)
-	for index := 0; index < userCount; index++  {
+	for index := 0; index < userCount; index++ {
 		if account == strings.ToLower(s.Config.Users[index].Account) {
 			user = &s.Config.Users[index]
 			break

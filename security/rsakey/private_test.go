@@ -17,4 +17,3 @@ func TestSignData(t *testing.T) {
 	t.Log("sign:", signedData)
 	t.Log("sign length:", len(signedData))
 }
-

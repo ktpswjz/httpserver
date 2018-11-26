@@ -1,9 +1,9 @@
 package id
 
 import (
+	"fmt"
 	"sync"
 	"time"
-	"fmt"
 )
 
 type innerTime struct {

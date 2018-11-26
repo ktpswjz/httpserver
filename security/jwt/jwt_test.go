@@ -6,9 +6,9 @@ func TestJwt_Encode(t *testing.T) {
 	jwt := NewEncoding("HS256", "your-256-bit-secret")
 
 	payload := &Payload{
-		Sub: "1234567890",
+		Sub:  "1234567890",
 		Name: "John Doe",
-		Iat: 1516239022,
+		Iat:  1516239022,
 	}
 	sign := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
@@ -18,7 +18,6 @@ func TestJwt_Encode(t *testing.T) {
 	}
 	t.Log("expect: ", sign)
 	t.Log("actual: ", signature)
-
 
 	if signature != sign {
 		t.Error("Invalid Signature")
@@ -42,7 +41,6 @@ func TestJwt_Decode(t *testing.T) {
 	t.Log("expect: ", "11")
 	t.Log("actual: ", payload.Sub)
 
-
 	if payload.Sub != "11" {
 		t.Error("Invalid Signature")
 	}
@@ -61,7 +59,7 @@ func TestJwt_Decode(t *testing.T) {
 }
 
 type Payload struct {
-	Sub 	string	`json:"sub"`
-	Name 	string	`json:"name"`
-	Iat 	int	`json:"iat"`
+	Sub  string `json:"sub"`
+	Name string `json:"name"`
+	Iat  int    `json:"iat"`
 }

@@ -1,12 +1,12 @@
 package id
 
 import (
-	"io"
 	"crypto/rand"
 	"fmt"
+	"io"
 )
 
-func GenerateGuid() string  {
+func GenerateGuid() string {
 	uuid := make([]byte, 16)
 	n, err := io.ReadFull(rand.Reader, uuid)
 	if n != len(uuid) || err != nil {
