@@ -60,11 +60,13 @@ func (s *innerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		", method=", r.Method,
 		", path=", a.path)
 
-	if a.schema == "http" {
-		if s.redirectToHttps {
-			redirectUrl := fmt.Sprintf("https://%s%s", r.Host, a.path)
-			http.Redirect(w, r, redirectUrl, http.StatusMovedPermanently)
-			return
+	if s.redirectToHttps {
+		if a.schema == "http" {
+			if r.Method == "GET" {
+				redirectUrl := fmt.Sprintf("https://%s%s", r.Host, a.path)
+				http.Redirect(w, r, redirectUrl, http.StatusMovedPermanently)
+				return
+			}
 		}
 	}
 

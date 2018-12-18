@@ -141,6 +141,16 @@ func (s *innerHost) Close() (err error) {
 }
 
 func (s *innerHost) getRemoteAddr(conn net.Conn) string {
+	if len(s.config.Proxy) > 0 {
+		addr := fmt.Sprint(conn.RemoteAddr())
+		ip, _, _ := net.SplitHostPort(addr)
+		if len(ip) > 0 {
+			if ip != s.config.Proxy {
+				return addr
+			}
+		}
+	}
+
 	rawConn := conn
 	if tlsConn, ok := conn.(*tls.Conn); ok {
 		rawConn = tlsConn.RawConn()
