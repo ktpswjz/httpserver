@@ -52,7 +52,7 @@ func (s *innerHost) Run() error {
 	if s.config.Http.Enabled {
 		srvCount++
 		go func() {
-			addr := fmt.Sprintf(":%s", s.config.Http.Port)
+			addr := fmt.Sprintf("%s:%s", s.config.Http.Address, s.config.Http.Port)
 			s.LogInfo("http listening on \"", addr, "\"")
 			s.httpServer = &http.Server{
 				Addr:            addr,
@@ -80,7 +80,7 @@ func (s *innerHost) Run() error {
 			pfx := &certificate.Pfx{}
 			err := pfx.LoadFromFile(certFilePath, s.config.Https.Cert.Password)
 			if nil == err {
-				addr := fmt.Sprintf(":%s", s.config.Https.Port)
+				addr := fmt.Sprintf("%s:%s", s.config.Https.Address, s.config.Https.Port)
 				s.LogInfo("https listening on \"", addr, "\"")
 
 				s.httpsServer = &http.Server{
