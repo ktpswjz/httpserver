@@ -47,7 +47,7 @@ func Info() (*Host, error) {
 	}
 	m, err := mem.VirtualMemory()
 	if err == nil {
-		info.Memory = memoryToText(float64(m.Total))
+		info.Memory = fmt.Sprintf("%s / %s", memoryToText(float64(m.Used)), memoryToText(float64(m.Total)))
 	}
 
 	zoneName, zoneOffset := time.Now().Local().Zone()

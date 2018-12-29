@@ -17,6 +17,8 @@ type Function interface {
 	IsIgnoreToken() bool
 	SetContentType(contentType string)
 	GetContentType() string
+	WebSocket(socket bool)
+	IsWebSocket() bool
 }
 
 type innerFunction struct {
@@ -31,6 +33,7 @@ type innerFunction struct {
 
 	ignoreToken bool   // 是否忽略凭证
 	contentType string // 请求体类型
+	webSocket   bool   // 是否WebSocket
 }
 
 func (s *innerFunction) GetName() string {
@@ -125,4 +128,12 @@ func (s *innerFunction) SetContentType(contentType string) {
 
 func (s *innerFunction) GetContentType() string {
 	return s.contentType
+}
+
+func (s *innerFunction) WebSocket(socket bool) {
+	s.webSocket = socket
+}
+
+func (s *innerFunction) IsWebSocket() bool {
+	return s.webSocket
 }

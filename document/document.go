@@ -117,6 +117,7 @@ func (s *innerDocument) appendFunction(f Function, method, path string, assistan
 	modelFunction.Path = path
 	modelFunction.Name = f.GetName()
 	modelFunction.Note = f.GetNote()
+	modelFunction.WebSocket = f.IsWebSocket()
 	modelFunction.ID = s.generateFunctionId(method, path)
 	modelFunction.InputHeaders = make([]*ModelHeader, 0)
 	if !f.IsIgnoreToken() {

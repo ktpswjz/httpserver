@@ -2,11 +2,11 @@ package network
 
 import (
 	"bytes"
-	"os/exec"
-	"io"
-	"strings"
-	"strconv"
 	"fmt"
+	"io"
+	"os/exec"
+	"strconv"
+	"strings"
 )
 
 func getListenPorts(ports *ListenCollection) {

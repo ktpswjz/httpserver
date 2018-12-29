@@ -7,6 +7,7 @@ type ModelFunction struct {
 	Method        string         `json:"method"`   // 接口方法
 	Path          string         `json:"path"`     // 接口地址
 	FullPath      string         `json:"fullPath"` // 接口地址
+	WebSocket     bool           `json:"webSocket"`
 	InputHeaders  []*ModelHeader `json:"inputHeaders"`
 	InputQueries  []*ModelQuery  `json:"inputQueries"`
 	InputModel    *ModelArgument `json:"inputModel"`
