@@ -1,14 +1,14 @@
 package doc
 
 import (
-	"github.com/ktpswjz/database/sqldb"
-	"os"
-	"strings"
-	"path/filepath"
-	"github.com/ktpswjz/database/sqldb/mysql"
 	"fmt"
-	"testing"
+	"github.com/ktpswjz/database/sqldb"
 	"github.com/ktpswjz/database/sqldb/mssql"
+	"github.com/ktpswjz/database/sqldb/mysql"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
 )
 
 func TestGenerator_CreateWord(t *testing.T) {
@@ -17,7 +17,7 @@ func TestGenerator_CreateWord(t *testing.T) {
 	if len(paths) > 1 {
 		goPath = paths[0]
 	}
-	docPath := filepath.Join(goPath, "tmp","db.docx")
+	docPath := filepath.Join(goPath, "tmp", "db.docx")
 	t.Log("doc file: ", docPath)
 	docFile, err := os.Create(docPath)
 	if err != nil {
