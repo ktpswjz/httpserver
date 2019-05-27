@@ -42,7 +42,7 @@ func (s *Client) Get(url string, argument interface{}) ([]byte, []byte, *tls.Con
 	return nil, bodyData, resp.TLS, resp.StatusCode, nil
 }
 
-func (s *Client) PostJson(url string, argument interface{}) ([]byte, []byte, *tls.ConnectionState, int, error) {
+func (s *Client) PostJson(url string, argument interface{}, headers ...Header) ([]byte, []byte, *tls.ConnectionState, int, error) {
 	var input []byte = nil
 	var body io.Reader = nil
 	if argument != nil {
@@ -69,7 +69,18 @@ func (s *Client) PostJson(url string, argument interface{}) ([]byte, []byte, *tl
 		client.Timeout = time.Duration(timeout)
 	}
 
-	resp, err := client.Post(url, "application/json;charset=utf-8", body)
+	req, err := http.NewRequest("POST", url, body)
+	if err != nil {
+		return input, nil, nil, 0, err
+	}
+	req.Header.Set("Content-Type", "application/json;charset=utf-8")
+	headerCount := len(headers)
+	for i := 0; i < headerCount; i++ {
+		header := headers[i]
+		req.Header.Add(header.Key, header.Value)
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return input, nil, nil, 0, err
 	}
