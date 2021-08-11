@@ -79,6 +79,7 @@ func (s *Client) PostJson(url string, argument interface{}, headers ...Header) (
 		header := headers[i]
 		req.Header.Add(header.Key, header.Value)
 	}
+	req.Close = true
 
 	resp, err := client.Do(req)
 	if err != nil {
